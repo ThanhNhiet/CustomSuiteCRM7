@@ -6,7 +6,9 @@ $hook_array = Array();
 // position, file, function 
 $hook_array['after_save'] = Array(); 
 $hook_array['after_save'][] = Array(77, 'updateMeetingGeocodeInfo', 'modules/Meetings/MeetingsJjwg_MapsLogicHook.php','MeetingsJjwg_MapsLogicHook', 'updateMeetingGeocodeInfo'); 
-
+$hook_array['after_save'][] = Array(
+    100, 'Push Notification', 'custom/include/hooks/PushNotificationHook.php', 'PushNotificationHook', 'afterSave'
+);
 
 
 ?>

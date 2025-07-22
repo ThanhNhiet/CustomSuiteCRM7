@@ -4,6 +4,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Api\V8\Controller\UserPasswordController;
 use Api\V8\Controller\ListViewController;
 use Api\V8\Controller\LanguageModuleController;
+use Api\V8\Controller\PushTokenController;
 
 $app->get('/user-password/{id}', UserPasswordController::class . ':getUserInfo');
 
@@ -14,6 +15,9 @@ $app->get('/{module}/default-fields', ListViewController::class . ':getDefaultFi
 
 // API ngôn ngữ theo format RESTful: /Api/V8/custom/{module}/language/lang={lang}
 $app->get('/{module}/language/lang={lang}', LanguageModuleController::class . ':getModuleLanguage');
+
+// API để lưu token push notification
+$app->post('/save-token', PushTokenController::class . ':saveToken');
 
 $app->get('/hello', function () {
     return 'Hello World!';
