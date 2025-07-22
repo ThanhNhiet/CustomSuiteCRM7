@@ -1,23 +1,34 @@
 <?php
 $listViewDefs ['Accounts'] = 
 array (
-  'NAME' => 
+  'ACCOUNT_TYPE' => 
   array (
-    'width' => '20%',
-    'label' => 'LBL_LIST_ACCOUNT_NAME',
-    'link' => true,
+    'width' => '10%',
+    'label' => 'LBL_TYPE',
     'default' => true,
   ),
-  'DATE_MODIFIED' => 
+  'PHONE_FAX' => 
   array (
-    'width' => '5%',
-    'label' => 'LBL_DATE_MODIFIED',
+    'width' => '10%',
+    'label' => 'LBL_PHONE_FAX',
     'default' => true,
   ),
-  'DATE_ENTERED' => 
+  'SHIPPING_ADDRESS_CITY' => 
   array (
-    'width' => '5%',
-    'label' => 'LBL_DATE_ENTERED',
+    'width' => '10%',
+    'label' => 'LBL_SHIPPING_ADDRESS_CITY',
+    'default' => true,
+  ),
+  'BILLING_ADDRESS_CITY' => 
+  array (
+    'width' => '10%',
+    'label' => 'LBL_LIST_CITY',
+    'default' => true,
+  ),
+  'BILLING_ADDRESS_COUNTRY' => 
+  array (
+    'width' => '10%',
+    'label' => 'LBL_BILLING_ADDRESS_COUNTRY',
     'default' => true,
   ),
   'ASSIGNED_USER_NAME' => 
@@ -26,13 +37,41 @@ array (
     'label' => 'LBL_LIST_ASSIGNED_USER',
     'module' => 'Employees',
     'id' => 'ASSIGNED_USER_ID',
-    'default' => false,
+    'default' => true,
   ),
-  'ACCOUNT_TYPE' => 
+  'PHONE_OFFICE' => 
   array (
     'width' => '10%',
-    'label' => 'LBL_TYPE',
-    'default' => false,
+    'label' => 'LBL_LIST_PHONE',
+    'default' => true,
+  ),
+  'EMAIL1' => 
+  array (
+    'width' => '15%',
+    'label' => 'LBL_EMAIL_ADDRESS',
+    'sortable' => false,
+    'link' => true,
+    'customCode' => '{$EMAIL1_LINK}',
+    'default' => true,
+  ),
+  'DATE_ENTERED' => 
+  array (
+    'width' => '5%',
+    'label' => 'LBL_DATE_ENTERED',
+    'default' => true,
+  ),
+  'EMPLOYEES' => 
+  array (
+    'width' => '10%',
+    'label' => 'LBL_EMPLOYEES',
+    'default' => true,
+  ),
+  'NAME' => 
+  array (
+    'width' => '20%',
+    'label' => 'LBL_LIST_ACCOUNT_NAME',
+    'link' => true,
+    'default' => true,
   ),
   'INDUSTRY' => 
   array (
@@ -40,28 +79,10 @@ array (
     'label' => 'LBL_INDUSTRY',
     'default' => false,
   ),
-  'BILLING_ADDRESS_CITY' => 
-  array (
-    'width' => '10%',
-    'label' => 'LBL_LIST_CITY',
-    'default' => false,
-  ),
-  'PHONE_FAX' => 
-  array (
-    'width' => '10%',
-    'label' => 'LBL_PHONE_FAX',
-    'default' => false,
-  ),
   'ANNUAL_REVENUE' => 
   array (
     'width' => '10%',
     'label' => 'LBL_ANNUAL_REVENUE',
-    'default' => false,
-  ),
-  'SHIPPING_ADDRESS_CITY' => 
-  array (
-    'width' => '10%',
-    'label' => 'LBL_SHIPPING_ADDRESS_CITY',
     'default' => false,
   ),
   'BILLING_ADDRESS_STREET' => 
@@ -76,12 +97,6 @@ array (
     'label' => 'LBL_BILLING_ADDRESS_STATE',
     'default' => false,
   ),
-  'BILLING_ADDRESS_COUNTRY' => 
-  array (
-    'width' => '10%',
-    'label' => 'LBL_BILLING_ADDRESS_COUNTRY',
-    'default' => false,
-  ),
   'BILLING_ADDRESS_POSTALCODE' => 
   array (
     'width' => '10%',
@@ -94,37 +109,16 @@ array (
     'label' => 'LBL_SHIPPING_ADDRESS_STREET',
     'default' => false,
   ),
-  'PHONE_OFFICE' => 
-  array (
-    'width' => '10%',
-    'label' => 'LBL_LIST_PHONE',
-    'default' => false,
-  ),
   'SHIPPING_ADDRESS_STATE' => 
   array (
     'width' => '7%',
     'label' => 'LBL_SHIPPING_ADDRESS_STATE',
     'default' => false,
   ),
-  'EMAIL1' => 
-  array (
-    'width' => '15%',
-    'label' => 'LBL_EMAIL_ADDRESS',
-    'sortable' => false,
-    'link' => true,
-    'customCode' => '{$EMAIL1_LINK}',
-    'default' => false,
-  ),
   'SHIPPING_ADDRESS_POSTALCODE' => 
   array (
     'width' => '10%',
     'label' => 'LBL_SHIPPING_ADDRESS_POSTALCODE',
-    'default' => false,
-  ),
-  'EMPLOYEES' => 
-  array (
-    'width' => '10%',
-    'label' => 'LBL_EMPLOYEES',
     'default' => false,
   ),
   'DESCRIPTION' => 
@@ -175,6 +169,12 @@ array (
   array (
     'width' => '10%',
     'label' => 'LBL_TICKER_SYMBOL',
+    'default' => false,
+  ),
+  'DATE_MODIFIED' => 
+  array (
+    'width' => '5%',
+    'label' => 'LBL_DATE_MODIFIED',
     'default' => false,
   ),
   'CREATED_BY_NAME' => 
