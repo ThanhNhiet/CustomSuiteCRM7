@@ -16,6 +16,9 @@ $app->get('/{module}/default-fields', 'ListViewController:getDefaultFields');
 // API để lấy các field từ detailviewdefs
 $app->get('/{module}/detail-fields', 'DetailViewController:getDetailFields');
 
+// API để lấy các field từ editviewdefs
+$app->get('/{module}/edit-fields', 'EditViewController:getEditFields');
+
 // API ngôn ngữ theo format RESTful: /Api/V8/custom/{module}/language/lang={lang}
 $app->get('/{module}/language/lang={lang}', LanguageModuleController::class . ':getModuleLanguage');
 
