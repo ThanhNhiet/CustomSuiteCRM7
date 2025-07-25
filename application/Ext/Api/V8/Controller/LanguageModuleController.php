@@ -95,9 +95,6 @@ class LanguageModuleController
         // 2. Tải ngôn ngữ module
         $this->loadModuleLanguage($module, $lang, $mod_strings);
 
-        // 3. Tải custom language nếu có
-        $this->loadCustomLanguage($module, $lang, $mod_strings, $app_strings, $app_list_strings);
-
         return [
             'mod_strings' => $mod_strings,
             'app_strings' => $app_strings,
@@ -110,14 +107,10 @@ class LanguageModuleController
      */
     private function loadSystemLanguage($lang, &$app_strings, &$app_list_strings)
     {
-        // Đường dẫn tới file language của hệ thống
-        $customPath = "custom/include/language/{$lang}.lang.php";
+        // Chỉ lấy file từ core path
         $corePath = "include/language/{$lang}.lang.php";
         
-        // Ưu tiên file custom trước, sau đó mới đến file core
-        if (file_exists($customPath)) {
-            include $customPath;
-        } elseif (file_exists($corePath)) {
+        if (file_exists($corePath)) {
             include $corePath;
         }
     }
@@ -127,33 +120,11 @@ class LanguageModuleController
      */
     private function loadModuleLanguage($module, $lang, &$mod_strings)
     {
-        // Đường dẫn tới file language của module
-        $customPath = "custom/modules/{$module}/language/{$lang}.lang.php";
+        // Chỉ lấy file từ core path
         $corePath = "modules/{$module}/language/{$lang}.lang.php";
         
-        // Ưu tiên file custom trước, sau đó mới đến file core
-        if (file_exists($customPath)) {
-            include $customPath;
-        } elseif (file_exists($corePath)) {
+        if (file_exists($corePath)) {
             include $corePath;
-        }
-    }
-
-    /**
-     * Tải custom language để override
-     */
-    private function loadCustomLanguage($module, $lang, &$mod_strings, &$app_strings, &$app_list_strings)
-    {
-        // Custom system language (override system)
-        $customSystemLangFile = "custom/include/language/{$lang}.lang.php";
-        if (file_exists($customSystemLangFile)) {
-            include $customSystemLangFile;
-        }
-
-        // Custom module language (override module)
-        $customModuleLangFile = "custom/modules/{$module}/language/{$lang}.lang.php";
-        if (file_exists($customModuleLangFile)) {
-            include $customModuleLangFile;
         }
     }
 
@@ -166,11 +137,10 @@ class LanguageModuleController
             return false;
         }
 
-        // Kiểm tra module có tồn tại không
-        $customPath = "custom/modules/{$module}";
+        // Kiểm tra module có tồn tại không (chỉ check core path)
         $corePath = "modules/{$module}";
         
-        return is_dir($customPath) || is_dir($corePath);
+        return is_dir($corePath);
     }
 
     /**
@@ -178,8 +148,8 @@ class LanguageModuleController
      */
     private function isValidLanguage($lang)
     {
-        // Kiểm tra format ngôn ngữ (en_us, vi_vn, etc.)
-        return preg_match('/^[a-z]{2}_[a-z]{2}$/', $lang);
+        // Kiểm tra format ngôn ngữ (en_us, vi_VN, en_GB, etc.)
+        return preg_match('/^[a-z]{2}_[a-zA-Z]{2}$/', $lang);
     }
 
     /**
