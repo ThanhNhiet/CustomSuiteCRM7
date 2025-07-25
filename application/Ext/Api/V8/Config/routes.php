@@ -11,7 +11,10 @@ $app->get('/user-password/{id}', UserPasswordController::class . ':getUserInfo')
 $app->post('/change-password/{id}', UserPasswordController::class . ':changePassword');
 
 // API để lấy các field có default = true từ listviewdefs
-$app->get('/{module}/default-fields', ListViewController::class . ':getDefaultFields');
+$app->get('/{module}/default-fields', 'ListViewController:getDefaultFields');
+
+// API để lấy các field từ detailviewdefs
+$app->get('/{module}/detail-fields', 'DetailViewController:getDetailFields');
 
 // API ngôn ngữ theo format RESTful: /Api/V8/custom/{module}/language/lang={lang}
 $app->get('/{module}/language/lang={lang}', LanguageModuleController::class . ':getModuleLanguage');
