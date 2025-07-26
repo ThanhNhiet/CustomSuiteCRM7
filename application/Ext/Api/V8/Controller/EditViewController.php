@@ -21,14 +21,8 @@ class EditViewController
         try {
             $fields = $this->extractEditFields($module);
             
-            $result = [
-                'module' => $module,
-                'fields' => $fields,
-                'count' => count($fields)
-            ];
-
             return $response->withHeader('Content-Type', 'application/json')
-                            ->write(json_encode($result));
+                            ->write(json_encode($fields, JSON_PRETTY_PRINT));
             
         } catch (Exception $e) {
             return $response->withStatus(500)->withHeader('Content-Type', 'application/json')
@@ -64,24 +58,19 @@ class EditViewController
         
         $panels = $viewdefs[$module]['EditView']['panels'];
         
-        // Lọc các field từ panels, bỏ qua LBL_PANEL_ASSIGNMENT
+        // Lọc các field từ panels
         foreach ($panels as $panelKey => $panelData) {
-            // Bỏ qua panel assignment
-            if (strtoupper($panelKey) === 'LBL_PANEL_ASSIGNMENT') {
-                continue;
-            }
-            
             if (is_array($panelData)) {
                 $this->processPanel($panelData, $fields);
             }
         }
         
         // Loại bỏ duplicate và return
-        return array_values(array_unique($fields));
+        return $fields;
     }
 
     /**
-     * Xử lý một panel để extract fields
+     * Xử lý một panel để extract fields với labels
      */
     private function processPanel($panelData, &$fields)
     {
@@ -89,12 +78,26 @@ class EditViewController
             if (is_array($row)) {
                 foreach ($row as $fieldData) {
                     if (is_string($fieldData) && !empty($fieldData)) {
-                        // Field đơn giản (string)
-                        $fields[] = $fieldData;
+                        // Field đơn giản (string) - không có label
+                        $fields[$fieldData] = "";
                     } elseif (is_array($fieldData) && isset($fieldData['name']) && !empty($fieldData['name'])) {
                         // Field phức tạp (array với name)
-                        $fields[] = $fieldData['name'];
+                        $fieldName = $fieldData['name'];
+                        $label = "";
+                        
+                        // Ưu tiên customLabel trước, sau đó label
+                        if (isset($fieldData['customLabel']) && !empty($fieldData['customLabel'])) {
+                            // Extract label từ customLabel nếu có pattern LBL_
+                            if (preg_match("/label='([^']+)'/", $fieldData['customLabel'], $matches)) {
+                                $label = $matches[1];
+                            }
+                        } elseif (isset($fieldData['label']) && !empty($fieldData['label'])) {
+                            $label = $fieldData['label'];
+                        }
+                        
+                        $fields[$fieldName] = $label;
                     }
+                    // Bỏ qua các field rỗng (empty string hoặc empty array)
                 }
             }
         }

@@ -25,6 +25,55 @@ class LanguageModuleController
     }
 
     /**
+     * API để lấy ngôn ngữ hệ thống (system language) theo format RESTful
+     * GET /api/v8/system/language/lang={lang}
+     */
+    public function getSystemLanguage(Request $request, Response $response, array $args)
+    {
+        $lang = $args['lang'] ?? 'en_us';
+
+        try {
+            // Kiểm tra API Token trước
+            if (!$this->validateApiToken($request)) {
+                return $response->withStatus(401)->withHeader('Content-Type', 'application/json')
+                                ->write(json_encode(['error' => 'Unauthorized: Invalid or missing API token']));
+            }
+
+            // Validation
+            if (!$this->isValidLanguage($lang)) {
+                return $response->withStatus(400)->withHeader('Content-Type', 'application/json')
+                                ->write(json_encode(['error' => 'Invalid language code']));
+            }
+
+            // Chỉ lấy system language
+            $app_strings = [];
+            $app_list_strings = [];
+            $this->loadSystemLanguage($lang, $app_strings, $app_list_strings);
+            
+            $result = [
+                'language' => $lang,
+                'data' => [
+                    'app_strings' => $app_strings,
+                    'app_list_strings' => $app_list_strings
+                ],
+                'meta' => [
+                    'app_strings_count' => count($app_strings),
+                    'app_list_strings_count' => count($app_list_strings),
+                    'timestamp' => date('Y-m-d H:i:s'),
+                    'endpoint' => "/system/language/lang={$lang}"
+                ]
+            ];
+
+            $response->getBody()->write(json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            return $response->withHeader('Content-Type', 'application/json');
+            
+        } catch (Exception $e) {
+            return $response->withStatus(500)->withHeader('Content-Type', 'application/json')
+                            ->write(json_encode(['error' => $e->getMessage()]));
+        }
+    }
+
+    /**
      * API để lấy ngôn ngữ của module theo format RESTful
      * GET /api/v8/{module}/language/lang={lang}
      */
