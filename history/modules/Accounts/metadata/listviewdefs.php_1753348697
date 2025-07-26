@@ -8,17 +8,16 @@ array (
     'link' => true,
     'default' => true,
   ),
-  'JJWG_MAPS_ADDRESS_C' => 
+  'DATE_MODIFIED' => 
   array (
-    'type' => 'varchar',
+    'width' => '5%',
+    'label' => 'LBL_DATE_MODIFIED',
     'default' => true,
-    'label' => 'LBL_JJWG_MAPS_ADDRESS',
-    'width' => '10%',
   ),
-  'PHONE_OFFICE' => 
+  'DATE_ENTERED' => 
   array (
-    'width' => '10%',
-    'label' => 'LBL_LIST_PHONE',
+    'width' => '5%',
+    'label' => 'LBL_DATE_ENTERED',
     'default' => true,
   ),
   'ASSIGNED_USER_NAME' => 
@@ -95,16 +94,10 @@ array (
     'label' => 'LBL_SHIPPING_ADDRESS_STREET',
     'default' => false,
   ),
-  'DATE_MODIFIED' => 
+  'PHONE_OFFICE' => 
   array (
-    'width' => '5%',
-    'label' => 'LBL_DATE_MODIFIED',
-    'default' => false,
-  ),
-  'DATE_ENTERED' => 
-  array (
-    'width' => '5%',
-    'label' => 'LBL_DATE_ENTERED',
+    'width' => '10%',
+    'label' => 'LBL_LIST_PHONE',
     'default' => false,
   ),
   'SHIPPING_ADDRESS_STATE' => 
