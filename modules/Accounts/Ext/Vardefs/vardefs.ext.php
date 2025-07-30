@@ -2,15 +2,21 @@
  //WARNING: The contents of this file are auto-generated
 
 
- // created: 2025-07-24 11:22:34
-$dictionary['Account']['fields']['date_entered']['required']=true;
-$dictionary['Account']['fields']['date_entered']['comments']='Date record created';
-$dictionary['Account']['fields']['date_entered']['merge_filter']='disabled';
+ // created: 2025-07-28 10:54:15
+$dictionary['Account']['fields']['date_entered']['required']=false;
 
  
 
  // created: 2025-07-24 11:20:56
 $dictionary['Account']['fields']['date_modified']['required']=false;
+
+ 
+
+ // created: 2025-07-28 10:54:34
+$dictionary['Account']['fields']['description']['required']=true;
+$dictionary['Account']['fields']['description']['inline_edit']=true;
+$dictionary['Account']['fields']['description']['comments']='Full text of the note';
+$dictionary['Account']['fields']['description']['merge_filter']='disabled';
 
  
 
@@ -47,6 +53,14 @@ $dictionary['Account']['fields']['phone_office']['required']=true;
 $dictionary['Account']['fields']['phone_office']['inline_edit']=true;
 $dictionary['Account']['fields']['phone_office']['comments']='The office phone number';
 $dictionary['Account']['fields']['phone_office']['merge_filter']='disabled';
+
+ 
+
+ // created: 2025-07-28 10:54:42
+$dictionary['Account']['fields']['rating']['required']=true;
+$dictionary['Account']['fields']['rating']['inline_edit']=true;
+$dictionary['Account']['fields']['rating']['comments']='An arbitrary rating for this company for use in comparisons with others';
+$dictionary['Account']['fields']['rating']['merge_filter']='disabled';
 
  
 
