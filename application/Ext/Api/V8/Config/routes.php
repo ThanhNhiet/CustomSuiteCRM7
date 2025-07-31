@@ -6,7 +6,7 @@ use Api\V8\Controller\ListViewController;
 use Api\V8\Controller\LanguageModuleController;
 use Api\V8\Controller\PushTokenController;
 
-$app->get('/user-password/{id}', UserPasswordController::class . ':getUserInfo');
+$app->get('/username/{id}', UserPasswordController::class . ':getUserInfo');
 
 $app->post('/change-password/{id}', UserPasswordController::class . ':changePassword');
 
