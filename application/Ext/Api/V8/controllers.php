@@ -5,6 +5,7 @@ require_once 'custom/application/Ext/Api/V8/Controller/LanguageModuleController.
 require_once 'custom/application/Ext/Api/V8/Controller/PushTokenController.php';
 require_once 'custom/application/Ext/Api/V8/Controller/DetailViewController.php';
 require_once 'custom/application/Ext/Api/V8/Controller/EditViewController.php';
+require_once 'custom/application/Ext/Api/V8/Controller/SearchController.php';
 
 use Api\V8\Controller\UserPasswordController;
 use Api\V8\Controller\ListViewController;
@@ -12,6 +13,7 @@ use Api\V8\Controller\LanguageModuleController;
 use Api\V8\Controller\PushTokenController;
 use Api\V8\Controller\DetailViewController;
 use Api\V8\Controller\EditViewController;
+use Api\V8\Controller\SearchController;
 use Slim\Container;
 
 return [
@@ -32,5 +34,8 @@ return [
     },
     'EditViewController' => function (Container $container) {
         return new EditViewController();
+    },
+    'SearchController' => function (Container $container) {
+        return new SearchController();
     },
 ];
