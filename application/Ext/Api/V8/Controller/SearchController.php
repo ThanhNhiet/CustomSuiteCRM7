@@ -90,11 +90,11 @@ class SearchController
 
     /**
      * Parse fields parameter hoặc sử dụng fields mặc định
-     * Luôn bao gồm id và name trong kết quả
+     * Luôn bao gồm id, name và date_entered trong kết quả
      */
     private function parseFields($module, $fieldsParam)
     {
-        $requiredFields = ['id']; // Luôn bao gồm id
+        $requiredFields = ['id', 'date_entered']; // Luôn bao gồm id và date_entered
         
         // Thêm name field tùy theo module
         $nameField = $this->getNameField($module);
