@@ -16,7 +16,7 @@ class UserPasswordController
         }
 
         $escapedId = $db->quote($id);
-        $query = "SELECT user_name, user_hash FROM users WHERE id = '{$escapedId}' AND deleted = false";
+        $query = "SELECT user_name FROM users WHERE id = '{$escapedId}' AND deleted = false";
         $result = $db->query($query);
 
         $userInfo = [];
