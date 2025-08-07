@@ -6,6 +6,7 @@ use Api\V8\Controller\ListViewController;
 use Api\V8\Controller\LanguageModuleController;
 use Api\V8\Controller\PushTokenController;
 use Api\V8\Controller\SearchController;
+use Api\V8\Controller\RoleUserController;
 
 $app->get('/username/{id}', UserPasswordController::class . ':getUserInfo');
 
@@ -31,6 +32,11 @@ $app->get('/{module}/language/lang={lang}', LanguageModuleController::class . ':
 
 // API để lưu token push notification
 $app->post('/save-token', 'PushTokenController:saveToken');
+
+// API để lấy danh sách roles của user
+$app->get('/user/{user_id}/roles', RoleUserController::class . ':getUserRoles');
+
+
 
 // // Test endpoint để debug
 // $app->get('/test', function () {

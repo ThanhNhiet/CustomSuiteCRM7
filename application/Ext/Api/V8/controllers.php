@@ -1,4 +1,5 @@
 <?php
+// Nạp các Controller tùy chỉnh của bạn
 require_once 'custom/application/Ext/Api/V8/Controller/UserPasswordController.php';
 require_once 'custom/application/Ext/Api/V8/Controller/ListViewController.php';
 require_once 'custom/application/Ext/Api/V8/Controller/LanguageModuleController.php';
@@ -6,6 +7,7 @@ require_once 'custom/application/Ext/Api/V8/Controller/PushTokenController.php';
 require_once 'custom/application/Ext/Api/V8/Controller/DetailViewController.php';
 require_once 'custom/application/Ext/Api/V8/Controller/EditViewController.php';
 require_once 'custom/application/Ext/Api/V8/Controller/SearchController.php';
+require_once 'custom/application/Ext/Api/V8/Controller/RoleUserController.php';
 
 use Api\V8\Controller\UserPasswordController;
 use Api\V8\Controller\ListViewController;
@@ -14,28 +16,32 @@ use Api\V8\Controller\PushTokenController;
 use Api\V8\Controller\DetailViewController;
 use Api\V8\Controller\EditViewController;
 use Api\V8\Controller\SearchController;
+use Api\V8\Controller\RoleUserController;
 use Slim\Container;
 
 return [
-    'UserPasswordController' => function (Container $container) {
+    UserPasswordController::class => function (Container $container) {
         return new UserPasswordController();
     },
-    'ListViewController' => function (Container $container) {
+    ListViewController::class => function (Container $container) {
         return new ListViewController();
     },
-    'LanguageModuleController' => function (Container $container) {
+    LanguageModuleController::class => function (Container $container) {
         return new LanguageModuleController();
     },
-    'PushTokenController' => function (Container $container) {
+    PushTokenController::class => function (Container $container) {
         return new PushTokenController();
     },
-    'DetailViewController' => function (Container $container) {
+    DetailViewController::class => function (Container $container) {
         return new DetailViewController();
     },
-    'EditViewController' => function (Container $container) {
+    EditViewController::class => function (Container $container) {
         return new EditViewController();
     },
-    'SearchController' => function (Container $container) {
+    SearchController::class => function (Container $container) {
         return new SearchController();
+    },
+    RoleUserController::class => function (Container $container) {
+        return new RoleUserController();
     },
 ];
