@@ -239,4 +239,16 @@ $searchFields['Accounts'] = array (
   array (
     'query_type' => 'default',
   ),
+  'phone_office' => 
+  array (
+    'query_type' => 'default',
+  ),
+  'shipping_address_city' => 
+  array (
+    'query_type' => 'default',
+  ),
+  'description' => 
+  array (
+    'query_type' => 'default',
+  ),
 );
