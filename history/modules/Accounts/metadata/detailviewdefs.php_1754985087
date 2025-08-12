@@ -111,8 +111,9 @@ array (
           ),
           1 => 
           array (
-            'name' => 'cccd_c',
-            'label' => 'LBL_CCCD',
+            'name' => 'phone_fax',
+            'comment' => 'The fax phone number of this company',
+            'label' => 'LBL_FAX',
           ),
         ),
         2 => 

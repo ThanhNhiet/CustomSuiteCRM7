@@ -2,6 +2,12 @@
  //WARNING: The contents of this file are auto-generated
 
 
+ // created: 2025-08-12 09:50:35
+$dictionary['Account']['fields']['cccd_c']['inline_edit']='1';
+$dictionary['Account']['fields']['cccd_c']['labelValue']='CCCD';
+
+ 
+
  // created: 2025-07-17 11:24:12
 $dictionary['Account']['fields']['date_entered']['required']=true;
 $dictionary['Account']['fields']['date_entered']['comments']='Date record created';
@@ -13,6 +19,12 @@ $dictionary['Account']['fields']['date_entered']['merge_filter']='disabled';
 $dictionary['Account']['fields']['date_modified']['required']=true;
 $dictionary['Account']['fields']['date_modified']['comments']='Date record last modified';
 $dictionary['Account']['fields']['date_modified']['merge_filter']='disabled';
+
+ 
+
+ // created: 2025-08-12 10:08:42
+$dictionary['Account']['fields']['diachi_c']['inline_edit']='1';
+$dictionary['Account']['fields']['diachi_c']['labelValue']='DIACHI';
 
  
 

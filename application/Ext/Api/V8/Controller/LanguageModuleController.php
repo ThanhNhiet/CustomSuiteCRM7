@@ -144,6 +144,9 @@ class LanguageModuleController
         // 2. Tải ngôn ngữ module
         $this->loadModuleLanguage($module, $lang, $mod_strings);
 
+        // 3. Tải ngôn ngữ custom module
+        $this->loadCustomModuleLanguage($module, $lang, $mod_strings);
+
         return [
             'mod_strings' => $mod_strings,
             'app_strings' => $app_strings,
@@ -172,6 +175,18 @@ class LanguageModuleController
         // Chỉ lấy file từ core path
         $corePath = "modules/{$module}/language/{$lang}.lang.php";
         
+        if (file_exists($corePath)) {
+            include $corePath;
+        }
+    }
+
+    /**
+     * Tải ngôn ngữ custom module
+     */
+    private function loadCustomModuleLanguage($module, $lang, &$mod_strings)
+    {
+        // custom\modules\Accounts\Ext\Language
+        $corePath = "custom/modules/{$module}/Ext/language/{$lang}.lang.ext.php";
         if (file_exists($corePath)) {
             include $corePath;
         }

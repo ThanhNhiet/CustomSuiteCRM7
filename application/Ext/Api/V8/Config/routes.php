@@ -5,6 +5,8 @@ use Api\V8\Controller\UserPasswordController;
 use Api\V8\Controller\ListViewController;
 use Api\V8\Controller\LanguageModuleController;
 use Api\V8\Controller\PushTokenController;
+use Api\V8\Controller\DetailViewController;
+use Api\V8\Controller\EditViewController;
 use Api\V8\Controller\SearchController;
 use Api\V8\Controller\RoleUserController;
 
@@ -13,13 +15,13 @@ $app->get('/username/{id}', UserPasswordController::class . ':getUserInfo');
 $app->post('/change-password/{id}', UserPasswordController::class . ':changePassword');
 
 // API để lấy các field có default = true từ listviewdefs
-$app->get('/{module}/list-fields', 'ListViewController:getDefaultFields');
+$app->get('/{module}/list-fields', ListViewController::class . ':getDefaultFields');
 
 // API để lấy các field từ detailviewdefs
-$app->get('/{module}/detail-fields', 'DetailViewController:getDetailFields');
+$app->get('/{module}/detail-fields', DetailViewController::class . ':getDetailFields');
 
 // API để lấy các field từ editviewdefs
-$app->get('/{module}/edit-fields', 'EditViewController:getEditFields');
+$app->get('/{module}/edit-fields', EditViewController::class . ':getEditFields');
 
 // API tìm kiếm theo từ khóa
 $app->get('/{module}', SearchController::class . ':searchModule');
@@ -31,7 +33,7 @@ $app->get('/system/language/lang={lang}', LanguageModuleController::class . ':ge
 $app->get('/{module}/language/lang={lang}', LanguageModuleController::class . ':getModuleLanguage');
 
 // API để lưu token push notification
-$app->post('/save-token', 'PushTokenController:saveToken');
+$app->post('/save-token', PushTokenController::class . ':saveToken');
 
 // API để lấy danh sách roles của user
 $app->get('/user/{user_id}/roles', RoleUserController::class . ':getUserRoles');
