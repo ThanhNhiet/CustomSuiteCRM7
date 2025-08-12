@@ -3,6 +3,8 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Api\V8\Controller\UserPasswordController;
 use Api\V8\Controller\ListViewController;
+use Api\V8\Controller\DetailViewController;
+use Api\V8\Controller\EditViewController;
 use Api\V8\Controller\LanguageModuleController;
 use Api\V8\Controller\PushTokenController;
 use Api\V8\Controller\DetailViewController;
