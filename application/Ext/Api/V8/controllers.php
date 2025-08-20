@@ -8,6 +8,7 @@ require_once 'custom/application/Ext/Api/V8/Controller/DetailViewController.php'
 require_once 'custom/application/Ext/Api/V8/Controller/EditViewController.php';
 require_once 'custom/application/Ext/Api/V8/Controller/SearchController.php';
 require_once 'custom/application/Ext/Api/V8/Controller/RoleUserController.php';
+require_once 'custom/application/Ext/Api/V8/Controller/SecurityGroupController.php';
 
 use Api\V8\Controller\UserPasswordController;
 use Api\V8\Controller\ListViewController;
@@ -17,7 +18,8 @@ use Api\V8\Controller\DetailViewController;
 use Api\V8\Controller\EditViewController;
 use Api\V8\Controller\SearchController;
 use Api\V8\Controller\RoleUserController;
-use Slim\Container;
+use Api\V8\Controller\SecurityGroupController;
+use Slim\Container;         
 
 return [
     UserPasswordController::class => function (Container $container) {
@@ -43,5 +45,8 @@ return [
     },
     RoleUserController::class => function (Container $container) {
         return new RoleUserController();
+    },
+    SecurityGroupController::class => function (Container $container) {
+        return new SecurityGroupController();
     },
 ];

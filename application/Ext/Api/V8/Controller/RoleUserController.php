@@ -71,13 +71,11 @@ class RoleUserController
                 continue;
             }
 
-            // Lấy actions của các modules cụ thể với ENABLED level trở lên
+            // Lấy actions của tất cả modules với tất cả access levels
             $sqlActions = "SELECT ara.action_id, ara.access_override, aa.category, aa.name as action_name
                            FROM acl_roles_actions ara
                            JOIN acl_actions aa ON ara.action_id = aa.id
-                           WHERE ara.role_id = {$roleIdQuoted}
-                           AND aa.category IN ('Tasks', 'Accounts', 'Meetings', 'Notes', 'Alerts')
-                           AND ara.access_override >= " . self::ACL_ALLOW_ENABLED;
+                           WHERE ara.role_id = {$roleIdQuoted}";
             $resultActions = $db->query($sqlActions);
             
             $actions = [];

@@ -7,10 +7,9 @@ use Api\V8\Controller\DetailViewController;
 use Api\V8\Controller\EditViewController;
 use Api\V8\Controller\LanguageModuleController;
 use Api\V8\Controller\PushTokenController;
-use Api\V8\Controller\DetailViewController;
-use Api\V8\Controller\EditViewController;
 use Api\V8\Controller\SearchController;
 use Api\V8\Controller\RoleUserController;
+use Api\V8\Controller\SecurityGroupController;
 
 $app->get('/username/{id}', UserPasswordController::class . ':getUserInfo');
 
@@ -40,7 +39,8 @@ $app->post('/save-token', PushTokenController::class . ':saveToken');
 // API để lấy danh sách roles của user
 $app->get('/user/{user_id}/roles', RoleUserController::class . ':getUserRoles');
 
-
+// API để lấy danh sách thành viên của nhóm bảo mật
+$app->get('/security-groups/{group_id}/members', SecurityGroupController::class . ':getMembers');
 
 // // Test endpoint để debug
 // $app->get('/test', function () {
