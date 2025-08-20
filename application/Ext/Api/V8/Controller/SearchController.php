@@ -27,6 +27,13 @@ class SearchController
         $fieldsParam = $queryParams['fields'] ?? ''; // Thêm parameter fields
         $page = (int)($queryParams['page'] ?? 1); // Page number (bắt đầu từ 1)
         $limit = (int)($queryParams['limit'] ?? 5); // Default 5 records per page
+        // Đọc filter dạng filter[field]=value
+        $filters = [];
+        foreach ($queryParams as $key => $value) {
+            if (preg_match('/^filter\[(.+)\]$/', $key, $matches)) {
+                $filters[$matches[1]] = $value;
+            }
+        }
 
         if (!$module) {
             return $response->withStatus(400)->withHeader('Content-Type', 'application/json')
@@ -55,8 +62,8 @@ class SearchController
             // Calculate offset for pagination
             $offset = ($page - 1) * $limit;
 
-            $searchResults = $this->performSearch($module, $keyword, $searchFields, $limit, $offset);
-            $totalCount = $this->getTotalSearchCount($module, $keyword, $searchFields);
+            $searchResults = $this->performSearch($module, $keyword, $searchFields, $limit, $offset, $filters);
+            $totalCount = $this->getTotalSearchCount($module, $keyword, $searchFields, $filters);
             $totalPages = ceil($totalCount / $limit);
             
             $result = [
@@ -143,7 +150,7 @@ class SearchController
     /**
      * Thực hiện tìm kiếm dựa trên module, keyword và custom fields với pagination
      */
-    private function performSearch($module, $keyword, $searchFields = null, $limit = 5, $offset = 0)
+    private function performSearch($module, $keyword, $searchFields = null, $limit = 5, $offset = 0, $filters = [])
     {
         $tableName = $this->getTableName($module);
         
@@ -181,10 +188,20 @@ class SearchController
             }
         }
 
+        // Thêm filter vào WHERE clause nếu có
+        $filterConditions = [];
+        if (!empty($filters)) {
+            foreach ($filters as $field => $value) {
+                $filterConditions[] = "{$field} = '" . $this->db->quote($value) . "'";
+            }
+        }
         $whereClause = implode(' OR ', $whereConditions);
-        
+        $fullWhere = "({$whereClause}) AND deleted = 0";
+        if (!empty($filterConditions)) {
+            $fullWhere .= " AND " . implode(' AND ', $filterConditions);
+        }
         // Tạo câu SQL chính với pagination và chỉ SELECT các fields được yêu cầu
-        $sql = "SELECT {$selectFields} FROM {$tableName} WHERE ({$whereClause}) AND deleted = 0 LIMIT {$limit} OFFSET {$offset}";
+        $sql = "SELECT {$selectFields} FROM {$tableName} WHERE {$fullWhere} LIMIT {$limit} OFFSET {$offset}";
         
         // Debug: Log SQL query
         error_log("Search SQL: " . $sql);
@@ -208,7 +225,7 @@ class SearchController
     /**
      * Đếm tổng số records cho pagination
      */
-    private function getTotalSearchCount($module, $keyword, $searchFields)
+    private function getTotalSearchCount($module, $keyword, $searchFields, $filters = [])
     {
         $tableName = $this->getTableName($module);
         
@@ -232,10 +249,20 @@ class SearchController
             }
         }
 
+        // Thêm filter vào WHERE clause nếu có
+        $filterConditions = [];
+        if (!empty($filters)) {
+            foreach ($filters as $field => $value) {
+                $filterConditions[] = "{$field} = '" . $this->db->quote($value) . "'";
+            }
+        }
         $whereClause = implode(' OR ', $whereConditions);
-        
+        $fullWhere = "({$whereClause}) AND deleted = 0";
+        if (!empty($filterConditions)) {
+            $fullWhere .= " AND " . implode(' AND ', $filterConditions);
+        }
         // Câu SQL đếm
-        $sql = "SELECT COUNT(*) as total FROM {$tableName} WHERE ({$whereClause}) AND deleted = 0";
+        $sql = "SELECT COUNT(*) as total FROM {$tableName} WHERE {$fullWhere}";
         
         $result = $this->db->query($sql);
         if (!$result) {
