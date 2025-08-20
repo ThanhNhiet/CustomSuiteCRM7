@@ -27,11 +27,14 @@ class SearchController
         $fieldsParam = $queryParams['fields'] ?? ''; // Thêm parameter fields
         $page = (int)($queryParams['page'] ?? 1); // Page number (bắt đầu từ 1)
         $limit = (int)($queryParams['limit'] ?? 5); // Default 5 records per page
-        // Đọc filter dạng filter[field]=value
+        // Log lại queryParams để debug
+        error_log('QueryParams: ' . json_encode($queryParams));
+        // Chỉ nhận filter từ các query param thường, loại trừ các param đặc biệt
         $filters = [];
+        $specialParams = ['keyword', 'fields', 'page', 'limit'];
         foreach ($queryParams as $key => $value) {
-            if (preg_match('/^filter\[(.+)\]$/', $key, $matches)) {
-                $filters[$matches[1]] = $value;
+            if (!in_array($key, $specialParams)) {
+                $filters[$key] = $value;
             }
         }
 
@@ -65,11 +68,11 @@ class SearchController
             $searchResults = $this->performSearch($module, $keyword, $searchFields, $limit, $offset, $filters);
             $totalCount = $this->getTotalSearchCount($module, $keyword, $searchFields, $filters);
             $totalPages = ceil($totalCount / $limit);
-            
             $result = [
                 'module' => $module,
                 'keyword' => $keyword,
                 'fields' => $searchFields,
+                'filter' => $filters,
                 'data' => $searchResults,
                 'pagination' => [
                     'current_page' => $page,
@@ -85,7 +88,6 @@ class SearchController
                     'endpoint' => "/{$module}?fields=" . implode(',', $searchFields) . "&keyword={$keyword}&page={$page}&limit={$limit}"
                 ]
             ];
-
             $response->getBody()->write(json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
             return $response->withHeader('Content-Type', 'application/json');
             
@@ -195,16 +197,24 @@ class SearchController
                 $filterConditions[] = "{$field} = '" . $this->db->quote($value) . "'";
             }
         }
-        $whereClause = implode(' OR ', $whereConditions);
-        $fullWhere = "({$whereClause}) AND deleted = 0";
-        if (!empty($filterConditions)) {
-            $fullWhere .= " AND " . implode(' AND ', $filterConditions);
+        $whereClause = '';
+        if (!empty($whereConditions)) {
+            $whereClause = '(' . implode(' OR ', $whereConditions) . ')';
         }
-        // Tạo câu SQL chính với pagination và chỉ SELECT các fields được yêu cầu
-        $sql = "SELECT {$selectFields} FROM {$tableName} WHERE {$fullWhere} LIMIT {$limit} OFFSET {$offset}";
-        
-        // Debug: Log SQL query
-        error_log("Search SQL: " . $sql);
+        $allConditions = [];
+        if ($whereClause) {
+            $allConditions[] = $whereClause;
+        }
+        $allConditions[] = 'deleted = 0';
+        if (!empty($filterConditions)) {
+            $allConditions = array_merge($allConditions, $filterConditions);
+        }
+        $fullWhere = implode(' AND ', $allConditions);
+    // Tạo câu SQL chính với pagination và chỉ SELECT các fields được yêu cầu
+    $sql = "SELECT {$selectFields} FROM {$tableName} WHERE {$fullWhere} LIMIT {$limit} OFFSET {$offset}";
+    // Debug: Log SQL query và filter
+    error_log("Search SQL: " . $sql);
+    error_log("Search FILTER: " . json_encode($filters));
         
         $result = $this->db->query($sql);
         $searchResults = [];
@@ -256,11 +266,19 @@ class SearchController
                 $filterConditions[] = "{$field} = '" . $this->db->quote($value) . "'";
             }
         }
-        $whereClause = implode(' OR ', $whereConditions);
-        $fullWhere = "({$whereClause}) AND deleted = 0";
-        if (!empty($filterConditions)) {
-            $fullWhere .= " AND " . implode(' AND ', $filterConditions);
+        $whereClause = '';
+        if (!empty($whereConditions)) {
+            $whereClause = '(' . implode(' OR ', $whereConditions) . ')';
         }
+        $allConditions = [];
+        if ($whereClause) {
+            $allConditions[] = $whereClause;
+        }
+        $allConditions[] = 'deleted = 0';
+        if (!empty($filterConditions)) {
+            $allConditions = array_merge($allConditions, $filterConditions);
+        }
+        $fullWhere = implode(' AND ', $allConditions);
         // Câu SQL đếm
         $sql = "SELECT COUNT(*) as total FROM {$tableName} WHERE {$fullWhere}";
         
