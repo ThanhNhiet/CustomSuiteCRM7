@@ -2,7 +2,6 @@
  //WARNING: The contents of this file are auto-generated
 
 
-<<<<<<< HEAD
  // created: 2025-08-12 09:50:35
 $dictionary['Account']['fields']['cccd_c']['inline_edit']='1';
 $dictionary['Account']['fields']['cccd_c']['labelValue']='CCCD';
@@ -13,10 +12,8 @@ $dictionary['Account']['fields']['cccd_c']['labelValue']='CCCD';
 $dictionary['Account']['fields']['date_entered']['required']=true;
 $dictionary['Account']['fields']['date_entered']['comments']='Date record created';
 $dictionary['Account']['fields']['date_entered']['merge_filter']='disabled';
-=======
  // created: 2025-07-28 10:54:15
 $dictionary['Account']['fields']['date_entered']['required']=false;
->>>>>>> 066ff0d2f167744691b00eeb1eb7e3a9d2226cf8
 
  
 
@@ -25,7 +22,6 @@ $dictionary['Account']['fields']['date_modified']['required']=false;
 
  
 
-<<<<<<< HEAD
  // created: 2025-08-12 10:08:42
 $dictionary['Account']['fields']['diachi_c']['inline_edit']='1';
 $dictionary['Account']['fields']['diachi_c']['labelValue']='DIACHI';
@@ -34,7 +30,6 @@ $dictionary['Account']['fields']['diachi_c']['labelValue']='DIACHI';
 
  // created: 2025-06-30 07:51:28
 $dictionary['Account']['fields']['jjwg_maps_address_c']['inline_edit']=1;
-=======
  // created: 2025-07-28 10:54:34
 $dictionary['Account']['fields']['description']['required']=true;
 $dictionary['Account']['fields']['description']['inline_edit']=true;
@@ -46,7 +41,6 @@ $dictionary['Account']['fields']['description']['merge_filter']='disabled';
  // created: 2025-07-24 11:21:51
 $dictionary['Account']['fields']['jjwg_maps_address_c']['inline_edit']='1';
 $dictionary['Account']['fields']['jjwg_maps_address_c']['labelValue']='Address';
->>>>>>> 066ff0d2f167744691b00eeb1eb7e3a9d2226cf8
 
  
 
@@ -87,7 +81,6 @@ $dictionary['Account']['fields']['rating']['comments']='An arbitrary rating for 
 $dictionary['Account']['fields']['rating']['merge_filter']='disabled';
 
  
-
  // created: 2025-07-24 11:22:09
 $dictionary['Account']['fields']['shipping_address_city']['required']=true;
 $dictionary['Account']['fields']['shipping_address_city']['inline_edit']=true;

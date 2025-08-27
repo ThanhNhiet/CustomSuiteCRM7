@@ -10,6 +10,7 @@ use Api\V8\Controller\PushTokenController;
 use Api\V8\Controller\SearchController;
 use Api\V8\Controller\RoleUserController;
 use Api\V8\Controller\SecurityGroupController;
+use Api\V8\Controller\UserGroupsController;
 
 $app->get('/username/{id}', UserPasswordController::class . ':getUserInfo');
 
@@ -41,6 +42,15 @@ $app->get('/user/{user_id}/roles', RoleUserController::class . ':getUserRoles');
 
 // API để lấy danh sách thành viên của nhóm bảo mật
 $app->get('/security-groups/{group_id}/members', SecurityGroupController::class . ':getMembers');
+
+// API để lấy danh sách nhóm của người dùng
+$app->get('/users/{user_id}/groups', UserGroupsController::class . ':getGroups');
+
+// API để lấy danh sách roles của nhóm
+$app->get('/security-groups/{group_id}/roles', UserGroupsController::class . ':getRoles');
+
+// API để lấy danh sách actions của role
+$app->get('/roles/{role_id}/actions', UserGroupsController::class . ':getRoleActions');
 
 // // Test endpoint để debug
 // $app->get('/test', function () {
