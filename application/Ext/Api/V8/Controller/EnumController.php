@@ -38,7 +38,7 @@ class EnumController
         foreach ($fields as $fieldName) {
             $fieldName = trim($fieldName);
 
-            if (!isset($bean->field_defs[$fieldName])) {
+            if (!isset($bean->field_defs[$fieldName]) && $fieldName !== 'parent_type') {
                 $results[$fieldName] = [
                     'success' => false,
                     'message' => "Field '{$fieldName}' not found in module '{$moduleName}'",
@@ -46,12 +46,37 @@ class EnumController
                 continue;
             }
 
-            $fieldDef = $bean->field_defs[$fieldName];
+            $fieldDef = $bean->field_defs[$fieldName] ?? [];
+            $optionKey = null;
 
-            // Nếu là enum và có options
-            if (($fieldDef['type'] ?? '') === 'enum' && !empty($fieldDef['options'])) {
-                $optionKey = $fieldDef['options'];
-                $values = $app_list_strings[$optionKey] ?? null;
+            // Nếu là enum hoặc parent_type
+            if (
+                ($fieldDef['type'] ?? '') === 'enum' && !empty($fieldDef['options'])
+                || $fieldName === 'parent_type'
+            ) {
+                if ($fieldName === 'parent_type') {
+                    // Ưu tiên dùng 'options' nếu có trong vardef
+                    if (!empty($fieldDef['options'])) {
+                        $optionKey = $fieldDef['options'];
+                    } else {
+                        // fallback danh sách thường gặp
+                        $candidates = [
+                            'record_type_display_notes',
+                            'record_type_display',
+                            'parent_type_display',
+                        ];
+                        foreach ($candidates as $key) {
+                            if (isset($app_list_strings[$key])) {
+                                $optionKey = $key;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    $optionKey = $fieldDef['options'];
+                }
+
+                $values = $optionKey ? ($app_list_strings[$optionKey] ?? null) : null;
 
                 if ($values) {
                     $results[$fieldName] = [
@@ -60,7 +85,8 @@ class EnumController
                     ];
                 } else {
                     $results[$fieldName] = [
-                        'message' => "Option '{$optionKey}' not found in language '{$lang}'",
+                        'success' => false,
+                        'message' => "Option for '{$fieldName}' not found in language '{$lang}'",
                     ];
                 }
             } else {
