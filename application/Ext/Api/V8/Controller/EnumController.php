@@ -55,13 +55,11 @@ class EnumController
 
                 if ($values) {
                     $results[$fieldName] = [
-                        'success' => true,
                         'options_key' => $optionKey,
                         'values' => $values,
                     ];
                 } else {
                     $results[$fieldName] = [
-                        'success' => false,
                         'message' => "Option '{$optionKey}' not found in language '{$lang}'",
                     ];
                 }
