@@ -11,6 +11,7 @@ use Api\V8\Controller\SearchController;
 use Api\V8\Controller\RoleUserController;
 use Api\V8\Controller\SecurityGroupController;
 use Api\V8\Controller\UserGroupsController;
+use Api\V8\Controller\EnumController;
 
 $app->get('/username/{id}', UserPasswordController::class . ':getUserInfo');
 
@@ -51,6 +52,8 @@ $app->get('/security-groups/{group_id}/roles', UserGroupsController::class . ':g
 
 // API để lấy danh sách actions của role
 $app->get('/roles/{role_id}/actions', UserGroupsController::class . ':getRoleActions');
+
+$app->get('/enum/{options}', EnumController::class . ':getEnumOptions');
 
 // // Test endpoint để debug
 // $app->get('/test', function () {
