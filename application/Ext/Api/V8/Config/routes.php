@@ -53,7 +53,7 @@ $app->get('/security-groups/{group_id}/roles', UserGroupsController::class . ':g
 // API để lấy danh sách actions của role
 $app->get('/roles/{role_id}/actions', UserGroupsController::class . ':getRoleActions');
 
-$app->get('/enum/{options}', EnumController::class . ':getEnumOptions');
+$app->get('/enum/{module}', EnumController::class . ':getModuleEnumOptions');
 
 // // Test endpoint để debug
 // $app->get('/test', function () {
