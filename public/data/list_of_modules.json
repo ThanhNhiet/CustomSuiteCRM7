@@ -1,0 +1,366 @@
+{
+    "Accounts": {
+        "label": "Accounts",
+        "access": [
+            "access",
+            "delete",
+            "edit",
+            "export",
+            "import",
+            "list",
+            "massupdate",
+            "view"
+        ]
+    },
+    "Calls": {
+        "label": "Calls",
+        "access": [
+            "access",
+            "delete",
+            "edit",
+            "export",
+            "import",
+            "list",
+            "massupdate",
+            "view"
+        ]
+    },
+    "Campaigns": {
+        "label": "Campaigns",
+        "access": [
+            "access",
+            "delete",
+            "edit",
+            "export",
+            "import",
+            "list",
+            "massupdate",
+            "view"
+        ]
+    },
+    "Cases": {
+        "label": "Cases",
+        "access": [
+            "access",
+            "delete",
+            "edit",
+            "export",
+            "import",
+            "list",
+            "massupdate",
+            "view"
+        ]
+    },
+    "Contacts": {
+        "label": "Contacts",
+        "access": [
+            "access",
+            "delete",
+            "edit",
+            "export",
+            "import",
+            "list",
+            "massupdate",
+            "view"
+        ]
+    },
+    "AOS_Contracts": {
+        "label": "Contracts",
+        "access": [
+            "access",
+            "delete",
+            "edit",
+            "export",
+            "import",
+            "list",
+            "massupdate",
+            "view"
+        ]
+    },
+    "Documents": {
+        "label": "Documents",
+        "access": [
+            "access",
+            "delete",
+            "edit",
+            "export",
+            "import",
+            "list",
+            "massupdate",
+            "view"
+        ]
+    },
+    "EmailTemplates": {
+        "label": "Email - Templates",
+        "access": [
+            "access",
+            "delete",
+            "edit",
+            "export",
+            "import",
+            "list",
+            "massupdate",
+            "view"
+        ]
+    },
+    "Emails": {
+        "label": "Emails",
+        "access": [
+            "access",
+            "delete",
+            "edit",
+            "export",
+            "import",
+            "list",
+            "massupdate",
+            "view"
+        ]
+    },
+    "FP_events": {
+        "label": "Events",
+        "access": [
+            "access",
+            "delete",
+            "edit",
+            "export",
+            "import",
+            "list",
+            "massupdate",
+            "view"
+        ]
+    },
+    "AOS_Invoices": {
+        "label": "Invoices",
+        "access": [
+            "access",
+            "delete",
+            "edit",
+            "export",
+            "import",
+            "list",
+            "massupdate",
+            "view"
+        ]
+    },
+    "AOK_Knowledge_Base_Categories": {
+        "label": "KB - Categories",
+        "access": [
+            "access",
+            "delete",
+            "edit",
+            "export",
+            "import",
+            "list",
+            "massupdate",
+            "view"
+        ]
+    },
+    "AOK_KnowledgeBase": {
+        "label": "Knowledge Base",
+        "access": [
+            "access",
+            "delete",
+            "edit",
+            "export",
+            "import",
+            "list",
+            "massupdate",
+            "view"
+        ]
+    },
+    "Leads": {
+        "label": "Leads",
+        "access": [
+            "access",
+            "delete",
+            "edit",
+            "export",
+            "import",
+            "list",
+            "massupdate",
+            "view"
+        ]
+    },
+    "FP_Event_Locations": {
+        "label": "Locations",
+        "access": [
+            "access",
+            "delete",
+            "edit",
+            "export",
+            "import",
+            "list",
+            "massupdate",
+            "view"
+        ]
+    },
+    "Meetings": {
+        "label": "Meetings",
+        "access": [
+            "access",
+            "delete",
+            "edit",
+            "export",
+            "import",
+            "list",
+            "massupdate",
+            "view"
+        ]
+    },
+    "Notes": {
+        "label": "Notes",
+        "access": [
+            "access",
+            "delete",
+            "edit",
+            "export",
+            "import",
+            "list",
+            "massupdate",
+            "view"
+        ]
+    },
+    "Opportunities": {
+        "label": "Opportunities",
+        "access": [
+            "access",
+            "delete",
+            "edit",
+            "export",
+            "import",
+            "list",
+            "massupdate",
+            "view"
+        ]
+    },
+    "AOS_PDF_Templates": {
+        "label": "PDF - Templates",
+        "access": [
+            "access",
+            "delete",
+            "edit",
+            "export",
+            "import",
+            "list",
+            "massupdate",
+            "view"
+        ]
+    },
+    "AOS_Products": {
+        "label": "Products",
+        "access": [
+            "access",
+            "delete",
+            "edit",
+            "export",
+            "import",
+            "list",
+            "massupdate",
+            "view"
+        ]
+    },
+    "AOS_Product_Categories": {
+        "label": "Products - Categories",
+        "access": [
+            "access",
+            "delete",
+            "edit",
+            "export",
+            "import",
+            "list",
+            "massupdate",
+            "view"
+        ]
+    },
+    "Project": {
+        "label": "Projects",
+        "access": [
+            "access",
+            "delete",
+            "edit",
+            "export",
+            "import",
+            "list",
+            "massupdate",
+            "view"
+        ]
+    },
+    "AM_ProjectTemplates": {
+        "label": "Projects - Templates",
+        "access": [
+            "access",
+            "delete",
+            "edit",
+            "export",
+            "import",
+            "list",
+            "massupdate",
+            "view"
+        ]
+    },
+    "AOS_Quotes": {
+        "label": "Quotes",
+        "access": [
+            "access",
+            "delete",
+            "edit",
+            "export",
+            "import",
+            "list",
+            "massupdate",
+            "view"
+        ]
+    },
+    "AOR_Reports": {
+        "label": "Reports",
+        "access": [
+            "access",
+            "delete",
+            "edit",
+            "export",
+            "import",
+            "list",
+            "massupdate",
+            "view"
+        ]
+    },
+    "Spots": {
+        "label": "Spots",
+        "access": [
+            "access",
+            "delete",
+            "edit",
+            "export",
+            "import",
+            "list",
+            "massupdate",
+            "view"
+        ]
+    },
+    "Surveys": {
+        "label": "Surveys",
+        "access": [
+            "access",
+            "delete",
+            "edit",
+            "export",
+            "import",
+            "list",
+            "massupdate",
+            "view"
+        ]
+    },
+    "Tasks": {
+        "label": "Tasks",
+        "access": [
+            "access",
+            "delete",
+            "edit",
+            "export",
+            "import",
+            "list",
+            "massupdate",
+            "view"
+        ]
+    }
+}
