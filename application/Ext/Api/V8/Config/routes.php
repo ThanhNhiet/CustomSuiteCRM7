@@ -13,6 +13,7 @@ use Api\V8\Controller\SecurityGroupController;
 use Api\V8\Controller\UserGroupsController;
 use Api\V8\Controller\EnumController;
 use Api\V8\Controller\FileController;
+use Api\V8\Controller\SetupController;
 
 $app->get('/username/{id}', UserPasswordController::class . ':getUserInfo');
 
@@ -57,6 +58,14 @@ $app->get('/roles/{role_id}/actions', UserGroupsController::class . ':getRoleAct
 $app->get('/enum/{module}', EnumController::class . ':getModuleEnumOptions');
 
 $app->get('/file/{module}/{id}', FileController::class . ':getFile');
+$app->post('/file/{module}/{id}', FileController::class . ':uploadFile');
+
+// API để lưu client secret
+$app->post('/setup/save-secret/{user_id}', SetupController::class . ':saveSecret');
+
+// API để lưu danh sách modules và quyền truy cập
+$app->post('/setup/save-modules-list/{user_id}', SetupController::class . ':saveModulesList');
+$app->get('/setup/get-modules-list', SetupController::class . ':getModulesList');
 
 // // Test endpoint để debug
 // $app->get('/test', function () {

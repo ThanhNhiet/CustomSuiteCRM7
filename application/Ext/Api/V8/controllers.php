@@ -12,6 +12,7 @@ require_once 'custom/application/Ext/Api/V8/Controller/SecurityGroupController.p
 require_once 'custom/application/Ext/Api/V8/Controller/UserGroupsController.php';
 require_once 'custom/application/Ext/Api/V8/Controller/EnumController.php';
 require_once 'custom/application/Ext/Api/V8/Controller/FileController.php';
+require_once 'custom/application/Ext/Api/V8/Controller/SetupController.php';
 
 use Api\V8\Controller\UserPasswordController;
 use Api\V8\Controller\ListViewController;
@@ -25,6 +26,7 @@ use Api\V8\Controller\SecurityGroupController;
 use Api\V8\Controller\UserGroupsController;
 use Api\V8\Controller\EnumController;
 use Api\V8\Controller\FileController;
+use Api\V8\Controller\SetupController;
 use Slim\Container;         
 
 return [
@@ -63,5 +65,8 @@ return [
     },
     FileController::class => function (Container $container) {
         return new FileController();
+    },
+    SetupController::class => function (Container $container) {
+        return new SetupController();
     },
 ];

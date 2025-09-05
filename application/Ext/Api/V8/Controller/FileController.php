@@ -332,4 +332,144 @@ class FileController
         $response->getBody()->write(json_encode($result));
         return $response->withHeader('Content-Type', 'application/json')->withStatus($statusCode);
     }
+    
+    /**
+     * Upload file API endpoint
+     * 
+     * @param Request $request
+     * @param Response $response
+     * @param array $args
+     * @return Response
+     */
+    public function uploadFile(Request $request, Response $response, array $args)
+    {
+        $moduleName = $args['module'];
+        $id = $args['id'];
+        
+        // Validate input
+        if (empty($moduleName) || empty($id)) {
+            return $this->errorResponse($response, 'Missing required parameters', 400);
+        }
+        
+        // Get uploaded files from the request
+        $uploadedFiles = $request->getUploadedFiles();
+        
+        // Check if file was uploaded
+        if (!isset($uploadedFiles['file'])) {
+            return $this->errorResponse($response, 'No file uploaded', 400);
+        }
+        
+        $file = $uploadedFiles['file'];
+        
+        // Check for upload errors
+        if ($file->getError() !== UPLOAD_ERR_OK) {
+            return $this->errorResponse($response, 'File upload failed with error code: ' . $file->getError(), 400);
+        }
+        
+        // Get file information
+        $originalFilename = $file->getClientFilename();
+        $mimeType = $file->getClientMediaType();
+        $extension = pathinfo($originalFilename, PATHINFO_EXTENSION);
+        
+        // Define the upload directory
+        $uploadDir = realpath(dirname(__FILE__) . '/../../../../../../upload/');
+        
+        if (!is_dir($uploadDir) || !is_writable($uploadDir)) {
+            return $this->errorResponse($response, 'Upload directory is not writable', 500);
+        }
+        
+        // Generate filename based on module
+        $targetFilename = '';
+        
+        if ($moduleName === 'AOS_Products') {
+            // For AOS_Products: ddmmyyyyhhmmss_{originalname}.jpg
+            $timestamp = date('dmYHis');
+            $targetFilename = $timestamp . '_' . $originalFilename;
+            
+            // Keep the original extension based on mime type
+            if ($extension) {
+                $targetFilename = substr($targetFilename, 0, strrpos($targetFilename, '.')) . '.' . $extension;
+            }
+        } elseif ($moduleName === 'Users') {
+            // For Users: {id}_photo (no extension)
+            $targetFilename = $id . '_photo';
+        } else {
+            // For all other modules: {id} (no extension)
+            $targetFilename = $id;
+        }
+        
+        // Full path to save the file
+        $targetPath = $uploadDir . '/' . $targetFilename;
+        
+        try {
+            // Move the uploaded file to the target location
+            $file->moveTo($targetPath);
+            
+            // Update file information in the database if needed
+            $this->updateFileInfoInDb($moduleName, $id, $originalFilename, $mimeType);
+            
+            // Generate URLs
+            $baseUrl = $this->getBaseUrl();
+            $fileUrl = rtrim($baseUrl, '/') . '/upload/' . $targetFilename;
+            $previewUrl = $baseUrl . "/custom/public/file_preview.php?id={$targetFilename}&type={$moduleName}&preview=true";
+            $downloadUrl = $baseUrl . "/custom/public/file_preview.php?id={$targetFilename}&type={$moduleName}&preview=false";
+            
+            // Return success response
+            $result = [
+                'success' => true,
+                'message' => 'File uploaded successfully',
+                'filename' => $targetFilename,
+                'original_filename' => $originalFilename,
+                'mime_type' => $mimeType,
+                'file_url' => $fileUrl,
+                'preview_url' => $previewUrl,
+                'download_url' => $downloadUrl
+            ];
+            
+            $response->getBody()->write(json_encode($result));
+            return $response->withHeader('Content-Type', 'application/json');
+        } catch (\Exception $e) {
+            return $this->errorResponse($response, 'Failed to save uploaded file: ' . $e->getMessage(), 500);
+        }
+    }
+    
+    /**
+     * Update file information in the database
+     * 
+     * @param string $moduleName
+     * @param string $id
+     * @param string $filename
+     * @param string $mimeType
+     */
+    private function updateFileInfoInDb($moduleName, $id, $filename, $mimeType)
+    {
+        global $beanList;
+        
+        // Check if module exists in bean list
+        if (!isset($beanList[$moduleName])) {
+            return;
+        }
+        
+        $beanClass = $beanList[$moduleName];
+        
+        // Load the bean for this record
+        $bean = new $beanClass();
+        if ($bean->retrieve($id)) {
+            // Update file-related fields if they exist in this bean
+            if (property_exists($bean, 'filename')) {
+                $bean->filename = $filename;
+            }
+            
+            if (property_exists($bean, 'file_mime_type')) {
+                $bean->file_mime_type = $mimeType;
+            }
+            
+            if (property_exists($bean, 'file_ext')) {
+                $bean->file_ext = pathinfo($filename, PATHINFO_EXTENSION);
+            }
+            
+            // Save the bean
+            $bean->save();
+        }
+    }
 }
