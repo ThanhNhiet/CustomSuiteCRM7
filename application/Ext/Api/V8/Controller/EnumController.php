@@ -30,9 +30,7 @@ class EnumController
         }
 
         // Lấy bean (vardefs đã merge custom + core)
-        $beanClass = $beanList[$moduleName];
-        require_once "modules/{$moduleName}/{$beanClass}.php";
-        $bean = new $beanClass();
+        $bean = \BeanFactory::newBean($moduleName);
 
         $results = [];
         foreach ($fields as $fieldName) {
