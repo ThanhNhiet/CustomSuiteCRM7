@@ -12,6 +12,7 @@ use Api\V8\Controller\RoleUserController;
 use Api\V8\Controller\SecurityGroupController;
 use Api\V8\Controller\UserGroupsController;
 use Api\V8\Controller\EnumController;
+use Api\V8\Controller\FileController;
 
 $app->get('/username/{id}', UserPasswordController::class . ':getUserInfo');
 
@@ -54,6 +55,8 @@ $app->get('/security-groups/{group_id}/roles', UserGroupsController::class . ':g
 $app->get('/roles/{role_id}/actions', UserGroupsController::class . ':getRoleActions');
 
 $app->get('/enum/{module}', EnumController::class . ':getModuleEnumOptions');
+
+$app->get('/file/{module}/{id}', FileController::class . ':getFile');
 
 // // Test endpoint để debug
 // $app->get('/test', function () {
