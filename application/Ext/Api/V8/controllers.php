@@ -10,7 +10,7 @@ require_once 'custom/application/Ext/Api/V8/Controller/SearchController.php';
 require_once 'custom/application/Ext/Api/V8/Controller/RoleUserController.php';
 require_once 'custom/application/Ext/Api/V8/Controller/SecurityGroupController.php';
 require_once 'custom/application/Ext/Api/V8/Controller/UserGroupsController.php';
-require_once 'custom/application/Ext/Api/V8/Controller/EnumController.php';
+require_once 'custom/application/Ext/Api/V8/Controller/DataTypeController.php';
 require_once 'custom/application/Ext/Api/V8/Controller/FileController.php';
 require_once 'custom/application/Ext/Api/V8/Controller/SetupController.php';
 
@@ -24,7 +24,7 @@ use Api\V8\Controller\SearchController;
 use Api\V8\Controller\RoleUserController;
 use Api\V8\Controller\SecurityGroupController;
 use Api\V8\Controller\UserGroupsController;
-use Api\V8\Controller\EnumController;
+use Api\V8\Controller\DataTypeController;
 use Api\V8\Controller\FileController;
 use Api\V8\Controller\SetupController;
 use Slim\Container;         
@@ -60,8 +60,8 @@ return [
     UserGroupsController::class => function (Container $container) {
         return new UserGroupsController();
     },
-    EnumController::class => function (Container $container) {
-        return new EnumController();
+    DataTypeController::class => function (Container $container) {
+        return new DataTypeController();
     },
     FileController::class => function (Container $container) {
         return new FileController();

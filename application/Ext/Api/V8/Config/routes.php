@@ -11,7 +11,7 @@ use Api\V8\Controller\SearchController;
 use Api\V8\Controller\RoleUserController;
 use Api\V8\Controller\SecurityGroupController;
 use Api\V8\Controller\UserGroupsController;
-use Api\V8\Controller\EnumController;
+use Api\V8\Controller\DataTypeController;
 use Api\V8\Controller\FileController;
 use Api\V8\Controller\SetupController;
 
@@ -55,7 +55,10 @@ $app->get('/security-groups/{group_id}/roles', UserGroupsController::class . ':g
 // API để lấy danh sách actions của role
 $app->get('/roles/{role_id}/actions', UserGroupsController::class . ':getRoleActions');
 
-$app->get('/enum/{module}', EnumController::class . ':getModuleEnumOptions');
+// API để lấy enum
+$app->get('/enum/{module}', DataTypeController::class . ':getModuleEnumOptions');
+// API để lấy relate type
+$app->get('/relate/{module}', DataTypeController::class . ':getModuleRelateType');
 
 $app->get('/file/{module}/{id}', FileController::class . ':getFile');
 $app->post('/file/{module}/{id}', FileController::class . ':uploadFile');
