@@ -8,6 +8,10 @@ $hook_array['after_save'] = Array();
 $hook_array['after_save'][] = Array(1, 'AOD Index Changes', 'modules/AOD_Index/AOD_LogicHooks.php','AOD_LogicHooks', 'saveModuleChanges'); 
 $hook_array['after_save'][] = Array(1, 'ElasticSearch Index Changes', 'lib/Search/ElasticSearch/ElasticSearchHooks.php','SuiteCRM\Search\ElasticSearch\ElasticSearchHooks', 'beanSaved'); 
 $hook_array['after_save'][] = Array(30, 'popup_select', 'modules/SecurityGroups/AssignGroups.php','AssignGroups', 'popup_select'); 
+
+// Push Notification Hook
+$hook_array['after_save'][] = Array(100, 'Push Notification Hook', 'custom/include/hooks/PushNotificationHook.php','PushNotificationHook', 'afterSave'); 
+
 $hook_array['after_delete'] = Array(); 
 $hook_array['after_delete'][] = Array(1, 'AOD Index changes', 'modules/AOD_Index/AOD_LogicHooks.php','AOD_LogicHooks', 'saveModuleDelete'); 
 $hook_array['after_delete'][] = Array(1, 'ElasticSearch Index Changes', 'lib/Search/ElasticSearch/ElasticSearchHooks.php','SuiteCRM\Search\ElasticSearch\ElasticSearchHooks', 'beanDeleted'); 
