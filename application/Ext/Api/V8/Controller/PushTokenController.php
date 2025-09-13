@@ -87,6 +87,37 @@ class PushTokenController
                         ->write(json_encode(['status' => 'saved', 'id' => $id]));
     }
 
+    public function getExpoToken(Request $request, Response $response, array $args)
+    {
+        global $db;
+
+        $userId = $args['id'] ?? null;
+
+        if (!$userId) {
+            return $response->withStatus(400)->withHeader('Content-Type', 'application/json')
+                            ->write(json_encode(['error' => 'Missing user_id']));
+        }
+
+        // Escape user_id để tránh SQL injection
+        $escapedUserId = "'" . $db->quote($userId) . "'";
+        
+        // Lấy expo_token của user
+        $query = "SELECT expo_token FROM user_devices WHERE user_id = $escapedUserId LIMIT 1";
+        $result = $db->query($query);
+        $tokenData = $db->fetchByAssoc($result);
+
+        if (!$tokenData) {
+            return $response->withStatus(404)->withHeader('Content-Type', 'application/json')
+                            ->write(json_encode(['success' => 'false', 'message' => 'No expo token found for this user']));
+        }
+
+        return $response->withHeader('Content-Type', 'application/json')
+                        ->write(json_encode([
+                            'success' => true,
+                            'expo_token' => $tokenData['expo_token'],
+                        ]));
+    }
+
     /**
      * Kiểm tra và tạo bảng user_devices nếu chưa tồn tại
      */

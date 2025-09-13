@@ -38,7 +38,9 @@ $app->get('/system/language/lang={lang}', LanguageModuleController::class . ':ge
 $app->get('/{module}/language/lang={lang}', LanguageModuleController::class . ':getModuleLanguage');
 
 // API để lưu token push notification
-$app->post('/save-token', PushTokenController::class . ':saveToken');
+$app->post('/expo-token', PushTokenController::class . ':saveToken');
+// API để lấy token push notification
+$app->get('/expo-token/{id}', PushTokenController::class . ':getExpoToken');
 
 // API để lấy danh sách roles của user
 $app->get('/user/{user_id}/roles', RoleUserController::class . ':getUserRoles');
