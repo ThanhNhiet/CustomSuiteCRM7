@@ -8,7 +8,7 @@ class PushNotificationHook
     {
         // Chỉ xử lý module Alerts, bỏ qua các module khác
         if ($bean->module_name !== 'Alerts') {
-            error_log("PushNotificationHook: Skipping module: " . $bean->module_name . " (only process Alerts)");
+            // error_log("PushNotificationHook: Skipping module: " . $bean->module_name . " (only process Alerts)");
             return;
         }
         
@@ -47,18 +47,26 @@ class PushNotificationHook
 
         // For Alerts module - sử dụng thông tin chi tiết từ alerts table
         $alertName = $bean->name ?? 'No name';
-        $targetModule = $bean->target_module ?? 'Unknown';
+        $targetId = $bean->target_module ?? 'Unknown record';
+        $type = $bean->type ?? 'Unknown Module';
         $description = $bean->description ?? '';
+        $url = $bean->url_redirect ?? 'Unknown URL';
         
         // Tạo body phong phú hơn từ thông tin alerts
         $body = "Alert: " . $alertName;
-        if (!empty($targetModule)) {
-            $body .= "\nTarget: " . $targetModule;
+        if (!empty($type)) {
+            $body .= "\nModule: " . $type;
         }
         if (!empty($description)) {
             // Giới hạn description để tránh notification quá dài
             $shortDescription = strlen($description) > 100 ? substr($description, 0, 100) . "..." : $description;
             $body .= "\nDetails: " . $shortDescription;
+        }
+        if (!empty($targetId)) {
+            $body .= "\nTarget ID: " . $targetId;
+        }
+        if (!empty($url)) {
+            $body .= "\nURL: " . $url;
         }
 
         // Query với DISTINCT để tránh token trùng lặp
