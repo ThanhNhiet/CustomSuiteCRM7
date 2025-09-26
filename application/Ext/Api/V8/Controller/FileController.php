@@ -258,7 +258,7 @@ class FileController
         // MOBILE DEVELOPMENT CONFIG - CHANGE THIS FOR MOBILE DEVELOPMENT
         // ---------------------------------------------------------------
         // Set to true when developing with mobile clients on local network
-        $mobileDevMode = true;
+        $mobileDevMode = false;
         
         // Your computer's local network IPv4 address for mobile development
         // For example: "192.168.1.100" - Find this using "ipconfig" (Windows) or "ifconfig" (Mac/Linux)

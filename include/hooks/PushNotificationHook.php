@@ -93,7 +93,8 @@ class PushNotificationHook
             'sound' => 'default',
             'title' => $title,
             'body' => $body,
-            "priority" => "high"
+            "priority" => "high",
+            'channelId' => 'high-priority'
         ];
 
         $ch = curl_init();
