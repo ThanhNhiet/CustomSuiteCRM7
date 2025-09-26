@@ -88,13 +88,36 @@ class PushNotificationHook
 
     private function sendExpoPush($expoToken, $title, $body)
     {
+        // Parse module và target ID từ body để tạo data
+        $moduleValue = null;
+        $targetIdValue = null;
+        $lines = explode("\n", $body);
+        
+        foreach ($lines as $line) {
+            if (strpos($line, 'Module:') === 0) {
+                $moduleValue = trim(str_replace('Module:', '', $line));
+            }
+            if (strpos($line, 'Target ID:') === 0) {
+                $targetIdValue = trim(str_replace('Target ID:', '', $line));
+            }
+        }
+
+        // Payload đơn giản nhưng hiệu quả cho killed app
         $payload = [
             'to' => $expoToken,
-            'sound' => 'default',
             'title' => $title,
             'body' => $body,
-            "priority" => "high",
-            'channelId' => 'high-priority'
+            'sound' => 'default',
+            'priority' => 'high',
+            'channelId' => 'high-priority',
+            'badge' => 1,
+            
+            // Data cho navigation khi app killed - QUAN TRỌNG
+            'data' => [
+                'module' => $moduleValue,
+                'targetId' => $targetIdValue,
+                'type' => 'crm_notification'
+            ]
         ];
 
         $ch = curl_init();
@@ -102,9 +125,15 @@ class PushNotificationHook
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
         
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        
+        // Log lỗi nếu có
+        if ($httpCode !== 200) {
+            error_log("Push failed: HTTP $httpCode - $response");
+        }
         
         curl_close($ch);
     }

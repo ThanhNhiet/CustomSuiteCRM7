@@ -1,0 +1,22 @@
+application/Ext/Include
+application/Ext/Language
+application/Ext/LogicHooks
+application/Ext/TableDictionary
+
+blowfish
+
+Extension
+
+history
+
+Include/tabConfig.php
+
+modulebuilder
+
+## Ignore all files in the modules directory except for the logic_hooks.php files
+modules/*
+!modules/*/logic_hooks.php
+
+themes
+
+working
