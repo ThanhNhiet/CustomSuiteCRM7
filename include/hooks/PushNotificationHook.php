@@ -50,25 +50,27 @@ class PushNotificationHook
         $targetId = $bean->target_module ?? 'Unknown record';
         $type = $bean->type ?? 'Unknown Module';
         $description = $bean->description ?? '';
-        $url = $bean->url_redirect ?? 'Unknown URL';
         
         // Tạo body phong phú hơn từ thông tin alerts
-        $body = "Alert: " . $alertName;
+        $body = "Name: " . $alertName;
+        //Tạo data module và targetId để xử lý navigation
+        $dataTargetId = "";
+        $dataModule = "";
+
         if (!empty($type)) {
             $body .= "\nModule: " . $type;
+            $dataModule = $type;
         }
         if (!empty($description)) {
             // Giới hạn description để tránh notification quá dài
             $shortDescription = strlen($description) > 100 ? substr($description, 0, 100) . "..." : $description;
             $body .= "\nDetails: " . $shortDescription;
         }
+        
         if (!empty($targetId)) {
-            $body .= "\nTarget ID: " . $targetId;
+            $dataTargetId = $targetId;
         }
-        if (!empty($url)) {
-            $body .= "\nURL: " . $url;
-        }
-
+        
         // Query với DISTINCT để tránh token trùng lặp
         $query = "SELECT DISTINCT expo_token FROM user_devices WHERE user_id = '$userId'";
         $result = $db->query($query);
@@ -82,27 +84,12 @@ class PushNotificationHook
         $tokens = array_unique($tokens);
         
         foreach ($tokens as $token) {
-            $this->sendExpoPush($token, $title, $body);
+            $this->sendExpoPush($token, $title, $body, $dataModule, $dataTargetId);
         }
     }
 
-    private function sendExpoPush($expoToken, $title, $body)
+    private function sendExpoPush($expoToken, $title, $body, $dataModule = "", $dataTargetId = "")
     {
-        // Parse module và target ID từ body để tạo data
-        $moduleValue = null;
-        $targetIdValue = null;
-        $lines = explode("\n", $body);
-        
-        foreach ($lines as $line) {
-            if (strpos($line, 'Module:') === 0) {
-                $moduleValue = trim(str_replace('Module:', '', $line));
-            }
-            if (strpos($line, 'Target ID:') === 0) {
-                $targetIdValue = trim(str_replace('Target ID:', '', $line));
-            }
-        }
-
-        // Payload đơn giản nhưng hiệu quả cho killed app
         $payload = [
             'to' => $expoToken,
             'title' => $title,
@@ -112,10 +99,10 @@ class PushNotificationHook
             'channelId' => 'high-priority',
             'badge' => 1,
             
-            // Data cho navigation khi app killed - QUAN TRỌNG
+            // Data cho navigation
             'data' => [
-                'module' => $moduleValue,
-                'targetId' => $targetIdValue,
+                'module' => $dataModule,
+                'targetId' => $dataTargetId,
                 'type' => 'crm_notification'
             ]
         ];
