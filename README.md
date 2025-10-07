@@ -200,4 +200,4 @@ const response = await fetch('/Api/V8/custom/expo-token/save', {
 
 ---
 
-**Version:** 1.0.0 | **SuiteCRM:** 7.x | **Updated:** $(date '+%d/%m/%Y')
+**Version:** 1.0.0 | **SuiteCRM:** 7.x | **Updated:** 10/07/2025
