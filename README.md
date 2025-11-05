@@ -22,15 +22,42 @@ unzip -o suitecrm-custom.zip -d /path/to/suitecrm7/
 
 ### 🔑 Bước 2: OAuth2 Client (BẮT BUỘC)
 
-**2.1. Tạo OAuth2 Client:**
+**2.1. Tạo private key và public key:**
+Nguồn tham khảo https://docs.suitecrm.com/developer/api/developer-setup-guide/json-api
+
+```bash
+cd your-path\xampp\apache\bin
+```
+
+```bash
+openssl genrsa -out private.key 2048
+```
+Lệnh này có nghĩa là "Sử dụng OpenSSL để tạo (gen) một khóa RSA".
+- openssl: Tên của công cụ bạn đang dùng.
+- genrsa: Lệnh con, là viết tắt của "Generate RSA" (Tạo khóa RSA).
+- -out private.key: Chỉ định file đầu ra (output). Kết quả của lệnh này (chính là khóa riêng tư) sẽ được lưu vào một tệp có tên là private.key.
+- 2048: Đây là độ dài của khóa (key length), tính bằng bit. 2048 bit là độ dài tiêu chuẩn, an toàn cho hầu hết các ứng dụng hiện nay. Khóa càng dài, càng an toàn, nhưng cũng xử lý chậm hơn một chút.
+
+```bash
+openssl rsa -in private.key -pubout -out public.key
+```
+Lệnh này có nghĩa là "Sử dụng công cụ quản lý RSA của OpenSSL để xử lý một khóa".
+- openssl: Tên công cụ.
+- rsa: Lệnh con, dùng để đọc, xử lý hoặc chuyển đổi các khóa RSA đã có.
+- -in private.key: Chỉ định tệp đầu vào (input). Nó sẽ đọc tệp private.key mà bạn vừa tạo.
+- -pubout: Đây là tùy chọn quan trọng nhất, là viết tắt của "Public Key Output". Nó ra lệnh "Tôi không muốn xem toàn bộ khóa, hãy chỉ trích xuất phần công khai ra thôi".
+- -out public.key: Chỉ định file đầu ra (output). Phần khóa công khai được trích xuất sẽ được lưu vào tệp public.key.
+- Kết quả: Bạn có một tệp public.key chỉ chứa thông tin công khai, được trích xuất từ tệp private.key.
+
+**2.2. Tạo OAuth2 Client:**
 1. **SuiteCRM Admin** → `OAuth2 Clients and Tokens`
-2. **Create Client:**
+2. **New Password Client:**
    - Name: `Mobile App Client`
    - Is Confidential: ✅ **Yes**  
-   - Grant Types: `authorization_code`, `client_credentials`, `password`
+   - Grant Types: `password`
 3. **Lưu** và copy **Client ID** + **Client Secret**
 
-**2.2. Lưu credentials:** 
+**2.3. Lưu credentials:** 
 
 **Tạo file (Nên làm khi muốn test để tiết kiệm thời gian):** `custom/public/data/client_secret.json`
 ```json
@@ -200,4 +227,4 @@ const response = await fetch('/Api/V8/custom/expo-token/save', {
 
 ---
 
-**Version:** 1.0.0 | **SuiteCRM:** 7.x | **Updated:** 10/07/2025
+**Version:** 1.0.0 | **SuiteCRM:** 7.x | **Updated:** 05/11/2025
