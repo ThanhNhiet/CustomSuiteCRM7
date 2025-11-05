@@ -23,6 +23,7 @@ unzip -o suitecrm-custom.zip -d /path/to/suitecrm7/
 ### 🔑 Bước 2: OAuth2 Client (BẮT BUỘC)
 
 **2.1. Tạo private key và public key:**
+
 Nguồn tham khảo https://docs.suitecrm.com/developer/api/developer-setup-guide/json-api
 
 ```bash
