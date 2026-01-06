@@ -1,17 +1,20 @@
 <?php
 $listViewDefs ['Employees'] = 
 array (
-  'OPEN_CHAT_BUTTON' => array (
+  'OPEN_CHAT_BUTTON' => array(
     'width' => '10%',
     'label' => 'LBL_CHAT_BUTTON',
     'default' => true,
     'sortable' => false,
+    'related_fields' => array(
+        'user_name',
+    ),
     'customCode' => '
-      <button type="button" class="button" 
-              style="background: #5676e9ff; color: white; border: none; padding: 2px 5px 6px 5px; cursor: pointer; font-size: 10px; border-radius: 4px;"
-              onclick=\'openRocketChatModal("http://localhost:3000/directory/users?layout=embedded"); event.stopPropagation(); return false;\'>
-          <span>Chat</span>
-      </button>
+        <button type="button" class="button"
+            style="background: #5676e9ff; color: white; border: none; padding: 2px 5px 6px 5px; cursor: pointer; font-size: 10px; border-radius: 4px;"
+            onclick=\'openRocketChatModal("http://localhost:3000/direct/{$USER_NAME}?layout=embedded"); event.stopPropagation(); return false;\'>
+            <span>Chat</span>
+        </button>
     ',
   ),
   'NAME' => 
