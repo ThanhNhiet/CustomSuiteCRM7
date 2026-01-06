@@ -6,6 +6,12 @@ application/Ext/TableDictionary
 blowfish
 
 Extension
+# Cho phép Employees Language files
+!Extension/modules/
+!Extension/modules/Employees/
+!Extension/modules/Employees/Ext/
+!Extension/modules/Employees/Ext/Language/
+!Extension/modules/Employees/Ext/Language/*
 
 history
 
@@ -16,6 +22,9 @@ modulebuilder
 ## Ignore all files in the modules directory except for the logic_hooks.php files
 modules/*
 !modules/*/logic_hooks.php
+# Cho phép toàn bộ thư mục Employees
+!modules/Employees/
+!modules/Employees/**
 
 themes
 
