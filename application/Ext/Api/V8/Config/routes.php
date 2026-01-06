@@ -72,9 +72,4 @@ $app->post('/setup/save-secret/{user_id}', SetupController::class . ':saveSecret
 $app->post('/setup/save-modules-list/{user_id}', SetupController::class . ':saveModulesList');
 $app->get('/setup/get-modules-list', SetupController::class . ':getModulesList');
 
-// // Test endpoint để debug
-// $app->get('/test', function () {
-//     return json_encode(['message' => 'Custom API is working!', 'timestamp' => date('Y-m-d H:i:s')]);
-// });
-
 return $app;
