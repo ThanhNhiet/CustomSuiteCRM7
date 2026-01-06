@@ -12,11 +12,7 @@ class EmployeesViewList extends ViewList {
                 
                 <div style="padding: 10px 15px; background: #f5f5f5; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center;">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <span style="font-weight:bold; font-size:18px; color: #333;">Rocket.Chat Directory</span>
-                        
-                        <button type="button" onclick="resetRocketChat()" style="padding: 5px 10px; cursor: pointer; border: 1px solid #ccc; background: #fff; border-radius: 3px;" title="Quay lại danh sách kênh">
-                            <span >Directory Home</span>
-                        </button>
+                        <span style="font-weight:bold; font-size:18px; color: #333;">Chatting</span>
                     </div>
 
                     <span onclick="closeRocketChatModal()" style="color:#aaa; font-size:28px; font-weight:bold; cursor:pointer; line-height: 20px;">&times;</span>
@@ -37,13 +33,6 @@ class EmployeesViewList extends ViewList {
             iframe.src = url; 
             
             document.getElementById("rc_modal").style.display = "block";
-        }
-
-        // Hàm Reset quay về trang chủ
-        function resetRocketChat() {
-            if(rocketBaseUrl) {
-                document.getElementById("rc_iframe").src = rocketBaseUrl;
-            }
         }
         
         function closeRocketChatModal() {
