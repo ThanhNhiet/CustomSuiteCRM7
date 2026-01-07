@@ -11,9 +11,9 @@ array (
     ),
     'customCode' => '
         <button type="button" class="button"
-            style="background: #5676e9ff; color: white; border: none; padding: 2px 5px 6px 5px; cursor: pointer; font-size: 10px; border-radius: 4px;"
+            style="background: #86a0ffff; color: white; border: none; padding: 2px 5px 6px 5px; cursor: pointer; font-size: 10px; border-radius: 4px;"
             onclick=\'openRocketChatModal("http://localhost:3000/direct/{$USER_NAME}?layout=embedded"); event.stopPropagation(); return false;\'>
-            <span>Chat</span>
+            <img src="custom/public/img/chatprivate_20x20.png" alt="Chat">
         </button>
     ',
   ),
