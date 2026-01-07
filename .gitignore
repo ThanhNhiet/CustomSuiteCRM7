@@ -5,13 +5,12 @@ application/Ext/TableDictionary
 
 blowfish
 
-Extension
-# Cho phép Employees Language files
+Extension/*
 !Extension/modules/
+Extension/modules/*
 !Extension/modules/Employees/
 !Extension/modules/Employees/Ext/
 !Extension/modules/Employees/Ext/Language/
-!Extension/modules/Employees/Ext/Language/*
 
 history
 
@@ -26,6 +25,6 @@ modules/*
 !modules/Employees/
 !modules/Employees/**
 
-themes
+!themes/SuiteP/tpls
 
 working
