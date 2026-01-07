@@ -82,7 +82,7 @@
             <div style="display: flex; gap: 5px;">
                 <button type="button" onclick="rcNav('home')" style="cursor:pointer; padding: 5px 10px; border: 1px solid #999; background: #e6f7ff; border-radius: 4px; margin-left: 10px;">Directory</button>
             </div>
-            <span style="font-weight:bold; color: #555;">Rocket.Chat</span>
+            <span style="font-weight:bold; color: #555;">Chat</span>
             <span onclick="document.getElementById('rc_modal').style.display='none'" style="color:#666; font-size:24px; font-weight:bold; cursor:pointer; padding: 0 10px;">&times;</span>
         </div>
 
