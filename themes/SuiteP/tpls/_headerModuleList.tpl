@@ -486,11 +486,11 @@
                     </div>
                 </li>
                 <li id="chat_1_1_btn" class="dropdown nav navbar-nav">
-                    <button class="dropdown-toggle" data-toggle="dropdown" onclick="openChatUserList('rc_user_dropdown_mobile');" title="User online" style="background: transparent; border: none; padding: 5px; margin-top: 3px;">
+                    <button class="dropdown-toggle" data-toggle="dropdown" onclick="openChatUserList('rc_user_dropdown_mobile');" title="User online" style="background: transparent; border: none;">
                         <img src="custom/public/img/useronline_40x40.png" alt="User online">
                     </button>
                     
-                    <ul id="rc_user_dropdown_mobile" class="dropdown-menu" role="menu" style="width: 320px; max-height: 450px; overflow-y: auto; padding: 0;">
+                    <ul id="rc_user_dropdown_mobile" class="dropdown-menu" role="menu" style="width: 120px; max-height: 450px; overflow-y: auto;">
                         <li style="padding: 15px; text-align: center; color: #999;">
                             <span class="suitepicon suitepicon-action-loading"></span> Loading...
                         </li>
@@ -607,11 +607,11 @@
                     </form>
                 </li>
                 <li id="chat_1_1_btn" class="dropdown nav navbar-nav">
-                    <button class="dropdown-toggle" data-toggle="dropdown" onclick="openChatUserList('rc_user_dropdown_tablet');" title="User online" style="background: transparent; border: none; padding: 5px; margin-top: 3px;">
+                    <button class="dropdown-toggle" data-toggle="dropdown" onclick="openChatUserList('rc_user_dropdown_tablet');" title="User online" style="background: transparent; border: none;">
                         <img src="custom/public/img/useronline_40x40.png" alt="User online">
                     </button>
                     
-                    <ul id="rc_user_dropdown_tablet" class="dropdown-menu" role="menu" style="width: 320px; max-height: 450px; overflow-y: auto; padding: 0;">
+                    <ul id="rc_user_dropdown_tablet" class="dropdown-menu" role="menu" style="width: 120px; max-height: 450px; overflow-y: auto; padding: 0;">
                         <li style="padding: 15px; text-align: center; color: #999;">
                             <span class="suitepicon suitepicon-action-loading"></span> Loading...
                         </li>
@@ -714,12 +714,12 @@
                 </li>
                 <li id="chat_1_1_btn" class="dropdown nav navbar-nav">
                     <button class="dropdown-toggle" data-toggle="dropdown" onclick="openChatUserList('rc_user_dropdown_desktop');" 
-                    title="User online" style="background: transparent; border: none; padding: 5px; margin-top: 3px;">
+                    title="User online" style="background: transparent; border: none;">
                         <img src="custom/public/img/useronline_40x40.png" alt="User online">
                     </button>
                     
                     <ul id="rc_user_dropdown_desktop" class="dropdown-menu" role="menu" 
-                    style="width: 320px; max-height: 450px; overflow-y: auto; padding: 0;">
+                    style="width: 200px; max-height: 450px; overflow-y: auto; padding: 0;">
                         <li style="padding: 15px; text-align: center; color: #999;">
                             <span class="suitepicon suitepicon-action-loading"></span> Loading...
                         </li>
