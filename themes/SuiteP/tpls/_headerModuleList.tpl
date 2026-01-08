@@ -485,6 +485,17 @@
                         </form>
                     </div>
                 </li>
+                <li id="chat_1_1_btn" class="dropdown nav navbar-nav">
+                    <button class="dropdown-toggle" data-toggle="dropdown" onclick="openChatUserList('rc_user_dropdown_mobile');" title="User online" style="background: transparent; border: none; padding: 5px; margin-top: 3px;">
+                        <img src="custom/public/img/useronline_40x40.png" alt="User online">
+                    </button>
+                    
+                    <ul id="rc_user_dropdown_mobile" class="dropdown-menu" role="menu" style="width: 320px; max-height: 450px; overflow-y: auto; padding: 0;">
+                        <li style="padding: 15px; text-align: center; color: #999;">
+                            <span class="suitepicon suitepicon-action-loading"></span> Loading...
+                        </li>
+                    </ul>
+                </li>
                 <li id="rocket_chat_header_btn" class="dropdown nav navbar-nav">
                      <button onclick="openRocketChatModal('http://localhost:3000/directory/channels?layout=embedded'); return false;" title="Rocket.Chat" style="background: transparent; border: none; padding: 5px;">
                         <img src="custom/public/img/chat_40x40.png" alt="Chat">
@@ -595,6 +606,17 @@
                         </div>
                     </form>
                 </li>
+                <li id="chat_1_1_btn" class="dropdown nav navbar-nav">
+                    <button class="dropdown-toggle" data-toggle="dropdown" onclick="openChatUserList('rc_user_dropdown_tablet');" title="User online" style="background: transparent; border: none; padding: 5px; margin-top: 3px;">
+                        <img src="custom/public/img/useronline_40x40.png" alt="User online">
+                    </button>
+                    
+                    <ul id="rc_user_dropdown_tablet" class="dropdown-menu" role="menu" style="width: 320px; max-height: 450px; overflow-y: auto; padding: 0;">
+                        <li style="padding: 15px; text-align: center; color: #999;">
+                            <span class="suitepicon suitepicon-action-loading"></span> Loading...
+                        </li>
+                    </ul>
+                </li>            
                 <li id="rocket_chat_header_btn" class="dropdown nav navbar-nav">
                      <button onclick="openRocketChatModal('http://localhost:3000/directory/channels?layout=embedded'); return false;" title="Rocket.Chat" style="background: transparent; border: none; padding: 5px;">
                         <img src="custom/public/img/chat_40x40.png" alt="Chat">
@@ -689,6 +711,19 @@
                     </span>
                         </div>
                     </form>
+                </li>
+                <li id="chat_1_1_btn" class="dropdown nav navbar-nav">
+                    <button class="dropdown-toggle" data-toggle="dropdown" onclick="openChatUserList('rc_user_dropdown_desktop');" 
+                    title="User online" style="background: transparent; border: none; padding: 5px; margin-top: 3px;">
+                        <img src="custom/public/img/useronline_40x40.png" alt="User online">
+                    </button>
+                    
+                    <ul id="rc_user_dropdown_desktop" class="dropdown-menu" role="menu" 
+                    style="width: 320px; max-height: 450px; overflow-y: auto; padding: 0;">
+                        <li style="padding: 15px; text-align: center; color: #999;">
+                            <span class="suitepicon suitepicon-action-loading"></span> Loading...
+                        </li>
+                    </ul>
                 </li>
                 <li id="rocket_chat_header_btn" class="dropdown nav navbar-nav">
                      <button onclick="openRocketChatModal('http://localhost:3000/directory/channels?layout=embedded'); return false;" title="Rocket.Chat" style="background: transparent; border: none; padding: 5px;">

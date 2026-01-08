@@ -119,6 +119,110 @@
         }
     }
 </script>
+<script type="text/javascript">
+    // Hàm gọi API lấy danh sách - Nhận tham số targetId
+    async function openChatUserList(targetId) {
+        // Mặc định là desktop nếu không truyền gì (đề phòng)
+        if (!targetId) targetId = 'rc_user_dropdown_desktop';
+
+        // Đường dẫn file PHP (Bạn xác nhận đường dẫn này đúng)
+        const url = '/suitecrm7/custom/public/api/get_rc_users.php'; 
+        
+        // Tìm đúng cái dropdown mình vừa bấm
+        const dropdown = document.getElementById(targetId);
+        
+        try {
+            // 1. Reset trạng thái Loading (quan trọng khi bấm lại lần 2)
+            if(dropdown) {
+                dropdown.innerHTML = '<li style="padding: 15px; text-align: center; color: #777;"><span class="suitepicon suitepicon-action-loading"></span> Đang tải...</li>';
+            } else {
+                console.error("Không tìm thấy ID: " + targetId);
+                return;
+            }
+
+            // 2. Gọi file PHP
+            const response = await fetch(url); 
+            
+            // Check nếu file PHP trả về lỗi 404 (đường dẫn sai)
+            if (response.status === 404) {
+                throw new Error('404 Not Found (Sai đường dẫn file PHP)');
+            }
+            if (!response.ok) {
+                throw new Error('HTTP Error: ' + response.status);
+            }
+            
+            // Kiểm tra xem có phải JSON không trước khi parse (tránh lỗi cú pháp)
+            const text = await response.text();
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                console.error("Response không phải JSON:", text);
+                throw new Error('Server trả về dữ liệu lỗi (Xem Console)');
+            }
+
+            // 3. Xử lý dữ liệu
+            if (data.success && data.users) {
+                // Truyền cả ID vào hàm render để nó vẽ đúng chỗ
+                renderUserDropdown(data.users, targetId); 
+            } else {
+                console.error("Data error:", data);
+                dropdown.innerHTML = '<li style="padding: 10px; text-align: center; color: red;">Không lấy được danh sách user.</li>';
+            }
+
+        } catch (error) {
+            console.error("Lỗi fetch:", error);
+            if(dropdown) dropdown.innerHTML = '<li style="padding: 10px; text-align: center; color: red; font-size: 12px;">' + error.message + '</li>';
+        }
+    }
+
+    // Hàm vẽ giao diện - Nhận thêm targetId
+    function renderUserDropdown(users, targetId) {
+        const dropdown = document.getElementById(targetId);
+        if (!dropdown) return;
+
+        let listHtml = '';
+        
+        listHtml += `
+            <li style="padding: 10px 15px; border-bottom: 1px solid #f0f0f0; font-weight: bold; font-size: 13px; background: #f9f9f9; color: #555;">
+                User status
+            </li>
+        `;
+
+        let count = 0;
+        users.forEach(user => {
+            if (user.username !== 'rocket.cat') { 
+                let color = '#cccccc'; 
+                if (user.status === 'online') color = '#2de0a5'; 
+                else if (user.status === 'busy') color = '#f5455c'; 
+                else if (user.status === 'away') color = '#ffd21f'; 
+
+                listHtml += `
+                    <li onclick="startDirectChat('${user.username}')" 
+                        style="border-bottom: 1px solid #f5f5f5; cursor: pointer;">
+                        <a href="javascript:void(0)" style="padding: 10px 15px; display: flex; align-items: center; gap: 12px; text-decoration: none; color: #333;">
+                            <div style="width: 10px; height: 10px; border-radius: 50%; background: ${color}; flex-shrink: 0;"></div>
+                            <div style="font-weight: 600; font-size: 13px;">
+                                ${user.name}
+                            </div>
+                        </a>
+                    </li>
+                `;
+                count++;
+            }
+        });
+
+        if(count === 0) {
+            listHtml += '<li style="padding: 15px; text-align: center; color: #999;">Không có user nào online.</li>';
+        }
+
+        dropdown.innerHTML = listHtml;
+    }
+
+    function startDirectChat(username) {
+        openRocketChatModal("http://localhost:3000/direct/" + username + "?layout=embedded");
+    }
+</script>
 {/literal}
 
 </body>
