@@ -10,7 +10,7 @@ require_once 'include/database/DBManagerFactory.php';
 
 class UserGroupsController
 {
-    // ACL Access Level Constants (giống RoleUserController)
+    // ACL Access Level Constants
     const ACL_ALLOW_ADMIN_DEV = 100;
     const ACL_ALLOW_ADMIN = 99;
     const ACL_ALLOW_DEV = 95;
@@ -250,7 +250,113 @@ class UserGroupsController
         ]);
     }
 
+    /**
+     * GET /Api/V8/custom/user/{user_id}/roles-task
+     * Get roles of user but only filter category = "Tasks" and name in ["access", "edit", "import"]
+     */
+    public function getUserTaskRoles(Request $request, Response $response, array $args): Response
+    {
+        $userId = $args['user_id'] ?? null;
+        if (!$userId) {
+            return $this->json($response, ['error' => 'Missing user_id'], 400);
+        }
 
+        $db = \DBManagerFactory::getInstance();
+        $userIdQuoted = "'" . $db->quote($userId) . "'";
+
+        $sqlUser = "SELECT id, user_name FROM users WHERE id = {$userIdQuoted} AND deleted = 0";
+        $resUser = $db->query($sqlUser);
+        $user = $db->fetchByAssoc($resUser);
+        if (!$user) {
+            return $this->json($response, ['error' => 'User not found'], 404);
+        }
+
+        // Map level -> label
+        $levels = [
+            self::ACL_ALLOW_ADMIN_DEV => 'ADMIN_DEV',
+            self::ACL_ALLOW_ADMIN     => 'ADMIN',
+            self::ACL_ALLOW_DEV       => 'DEV',
+            self::ACL_ALLOW_ALL       => 'ALL',
+            self::ACL_ALLOW_ENABLED   => 'ENABLED',
+            self::ACL_ALLOW_OWNER     => 'OWNER',
+            self::ACL_ALLOW_NORMAL    => 'NORMAL',
+            self::ACL_ALLOW_DEFAULT   => 'DEFAULT',
+            self::ACL_ALLOW_DISABLED  => 'DISABLED',
+            self::ACL_ALLOW_NONE      => 'NONE',
+        ];
+
+        $sqlRoles = "
+            SELECT DISTINCT 
+                r.id AS role_id,
+                r.name AS role_name,
+                r.description,
+                a.id AS action_id,
+                a.name AS action_name,
+                a.category,
+                ra.access_override,
+                a.acltype
+            FROM acl_roles_users ru
+            INNER JOIN acl_roles r
+                ON r.id = ru.role_id AND r.deleted = 0
+            INNER JOIN acl_roles_actions ra
+                ON ra.role_id = r.id AND ra.deleted = 0
+            INNER JOIN acl_actions a
+                ON a.id = ra.action_id AND a.deleted = 0
+            WHERE ru.user_id = {$userIdQuoted}
+              AND a.category = 'Tasks'
+              AND a.name IN ('access', 'edit', 'import')
+            ORDER BY r.name ASC, a.name ASC
+        ";
+        $resRoles = $db->query($sqlRoles);
+
+        $roles = [];
+        $currentRoleId = null;
+        $currentRole = null;
+
+        while ($row = $db->fetchByAssoc($resRoles)) {
+            if ($currentRoleId !== $row['role_id']) {
+                if ($currentRole !== null) {
+                    $roles[] = $currentRole;
+                }
+
+                $currentRoleId = $row['role_id'];
+                $currentRole = [
+                    'role_id'     => $row['role_id'],
+                    'role_name'   => $row['role_name'],
+                    'description' => $row['description'] ?? '',
+                    'actions'     => []
+                ];
+            }
+
+            $levelValue = (int)$row['access_override'];
+            $currentRole['actions'][] = [
+                'id'                => $row['action_id'],
+                'name'              => $row['action_name'],
+                'category'          => $row['category'],
+                'access_override'   => $levelValue,
+                'access_level_name' => $levels[$levelValue] ?? 'UNKNOWN',
+                'aclvalue'          => $row['acltype'] ?? 'module'
+            ];
+        }
+
+        if ($currentRole !== null) {
+            $roles[] = $currentRole;
+        }
+
+        return $this->json($response, [
+            'user_id'     => $userId,
+            'roles'       => $roles,
+            'total_roles' => count($roles),
+            'meta'        => [
+                'timestamp' => date('Y-m-d H:i:s'),
+                'endpoint'  => "/user/{$userId}/roles-task",
+                'filter'    => [
+                    'category' => 'Tasks',
+                    'actions'  => ['access', 'edit', 'import']
+                ]
+            ]
+        ]);
+    }
 
     private function json(Response $response, $data, int $status = 200): Response
     {

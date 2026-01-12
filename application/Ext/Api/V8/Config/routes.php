@@ -45,6 +45,9 @@ $app->get('/expo-token/{id}', PushTokenController::class . ':getExpoToken');
 // API để lấy danh sách roles của user
 $app->get('/user/{user_id}/roles', RoleUserController::class . ':getUserRoles');
 
+// API để lấy danh sách task roles của user
+$app->get('/user/{user_id}/roles-task', UserGroupsController::class . ':getUserTaskRoles');
+
 // API để lấy danh sách thành viên của nhóm bảo mật
 $app->get('/security-groups/{group_id}/members', SecurityGroupController::class . ':getMembers');
 
