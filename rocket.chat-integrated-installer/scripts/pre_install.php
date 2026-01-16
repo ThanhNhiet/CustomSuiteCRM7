@@ -16,13 +16,10 @@ function pre_install() {
         if(empty($_REQUEST['install_file']) && isset($_SESSION['install_file_path'])){
              $_REQUEST['install_file'] = $_SESSION['install_file_path'];
         }
-
         return;
     }
 
-    displayInstallForm();
-    
-    die();
+    displayInstallForm();   
 }
 
 function displayInstallForm() {

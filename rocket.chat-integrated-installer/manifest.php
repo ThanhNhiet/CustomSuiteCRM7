@@ -23,18 +23,7 @@ $installdefs = array(
     'post_install_file' => '<basepath>/scripts/post_install.php',
     
     'copy' => array(
-        array(
-            'from' => '<basepath>/files/custom/public',
-            'to' => 'custom/public',
-        ),
-        array(
-            'from' => '<basepath>/files/custom/themes',
-            'to' => 'custom/themes',
-        ),
-        array(
-            'from' => '<basepath>/files/custom/application',
-            'to' => 'custom/application',
-        ),
+        array('from' => '<basepath>/files/custom', 'to' => 'custom'),
     ),
 );
 ?>

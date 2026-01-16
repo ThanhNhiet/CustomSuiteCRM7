@@ -18,6 +18,8 @@ function post_install() {
 
         $files_to_update = array(
             'custom/public/api/get_rc_users.php',
+            'custom/public/api/get_secret_oauth.php',
+            'custom/public/api/custom_identity.php',
             'custom/public/data/client_secret_oauth.json'
         );
 
