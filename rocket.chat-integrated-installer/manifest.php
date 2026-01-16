@@ -19,7 +19,6 @@ $manifest = array(
 
 $installdefs = array(
     'id' => 'rocket_chat_integration',
-    'pre_install_file' => '<basepath>/scripts/pre_install.php',
     'post_install_file' => '<basepath>/scripts/post_install.php',
     
     'copy' => array(
