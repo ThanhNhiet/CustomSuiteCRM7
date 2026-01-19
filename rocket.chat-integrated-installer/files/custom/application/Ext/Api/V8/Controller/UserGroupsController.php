@@ -44,7 +44,7 @@ class UserGroupsController
             return $this->json($response, ['error' => 'User not found'], 404);
         }
 
-        // Lấy các group của user
+        // Get groups of user
         $sqlGroups = "
             SELECT g.id, g.name, g.description
             FROM securitygroups_users gu
@@ -68,7 +68,7 @@ class UserGroupsController
             $groupIds[] = $row['id'];
         }
 
-        // Nếu không có group, trả luôn
+        // If not include roles, return now
         if (!$includeRoles || empty($groupIds)) {
             return $this->json($response, [
                 'user'   => ['id' => $user['id'], 'user_name' => $user['user_name']],
@@ -81,7 +81,7 @@ class UserGroupsController
             ]);
         }
 
-        // Lấy Role cho các group (1 query cho tất cả group)
+        //Get roles for each group
         $quoted = array_map(function ($id) use ($db) {
             return "'" . $db->quote($id) . "'";
         }, $groupIds);
@@ -112,7 +112,7 @@ class UserGroupsController
             ];
         }
 
-        // Gắn roles vào từng group
+        // Add roles to groups
         foreach ($groups as &$g) {
             $g['roles'] = $rolesByGroup[$g['id']] ?? [];
         }
@@ -138,14 +138,14 @@ class UserGroupsController
         $db = \DBManagerFactory::getInstance();
         $gid = "'" . $db->quote($groupId) . "'";
 
-        // check group tồn tại
+        // check group exists
         $rs   = $db->query("SELECT id,name FROM securitygroups WHERE id=$gid AND deleted=0");
         $grp  = $db->fetchByAssoc($rs);
         if (!$grp) {
             return $this->json($response, ['error' => 'Group not found'], 404);
         }
 
-        // lấy role
+        // Get roles
         $sql = "
             SELECT r.id AS role_id, r.name AS role_name, r.description
             FROM securitygroups_acl_roles gr
@@ -194,7 +194,7 @@ class UserGroupsController
             return $this->json($response, ['error' => 'Role not found'], 404);
         }
 
-        // map level -> label (giống RoleUserController)
+        // map level -> label
         $levels = [
             self::ACL_ALLOW_ADMIN_DEV => 'ADMIN_DEV',
             self::ACL_ALLOW_ADMIN     => 'ADMIN',
@@ -208,7 +208,7 @@ class UserGroupsController
             self::ACL_ALLOW_NONE      => 'NONE',
         ];
 
-        // lấy actions của role (giống logic RoleUserController)
+        // Get actions of role
         $sqlActions = "SELECT a.id as action_id,
                               a.category AS module,
                               a.name AS action_name,
@@ -224,7 +224,6 @@ class UserGroupsController
 
         $actions = [];
         while ($row = $db->fetchByAssoc($rsActions)) {
-            // Dùng access_override như RoleUserController
             $levelValue = (int)$row['access_override'];
 
             $actions[] = [

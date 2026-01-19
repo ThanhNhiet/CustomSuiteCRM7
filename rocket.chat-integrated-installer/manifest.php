@@ -5,7 +5,7 @@ $manifest = array(
         'regex_matches' => array('6\.5\..*', '7\..*', '8\..*'),
     ),
     'acceptable_sugar_flavors' => array('CE', 'PRO', 'CORP', 'ENT', 'ULT'),
-    'readme' => 'README.md',
+    'readme' => 'readme.txt',
     'key' => 'rocket_chat_integration',
     'author' => 'Admin',
     'description' => 'Rocket.Chat Integration - Auto configured installer',
@@ -20,6 +20,7 @@ $manifest = array(
 $installdefs = array(
     'id' => 'rocket_chat_integration',
     'post_install_file' => '<basepath>/scripts/post_install.php',
+    'post_uninstall_file' => '<basepath>/scripts/post_uninstall.php',
     
     'copy' => array(
         array('from' => '<basepath>/files/custom', 'to' => 'custom'),
