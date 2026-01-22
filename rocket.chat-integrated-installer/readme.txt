@@ -78,6 +78,9 @@ application
                     UserGroupsController.php
 ```
 
+**Important Warning 3**: If you are blocked by cors policy, please refer to the .htaccess.example file in this folder.
+```
+
 ## Post-Installation Configuration
 
 After installation, you can reconfigure settings through:
