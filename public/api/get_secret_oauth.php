@@ -1,34 +1,61 @@
 <?php
 
-session_start();
-
-$limit = 40;
+//--- START RATE LIMITER ---
+$limit = 30;
 $window = 60;
-$path = $_SERVER['REQUEST_URI'];
-$ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-$key = 'rate_limit_' . md5($ip . $path);
+// $tmpDir = sys_get_temp_dir();
+$tmpDir = __DIR__ . '/../tmp';
+
+if (!is_dir($tmpDir)) {
+    mkdir($tmpDir, 0770, true);
+}
+
+$ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+if (strpos($ip, ',') !== false) {
+    $ip = explode(',', $ip)[0];
+}
+$ip = trim($ip);
+
+$cacheFile = $tmpDir . '/ratelimit_' . md5($ip . 'get_secret_oauth');
 $now = time();
 
-if (!isset($_SESSION[$key])) {
-    $_SESSION[$key] = ['count' => 1, 'start' => $now];
-} else {
-    $elapsed = $now - $_SESSION[$key]['start'];
-    if ($elapsed > $window) {
-        $_SESSION[$key] = ['count' => 1, 'start' => $now];
-    } else {
-        $_SESSION[$key]['count']++;
-    }
-}
+$fp = fopen($cacheFile, 'c+');
 
-if ($_SESSION[$key]['count'] > $limit) {
-    http_response_code(429);
-    header('Content-Type: application/json');
-    echo json_encode([
-        'error' => 'Too Many Requests',
-        'message' => 'Rate limit exceeded. Max 40 requests per 60 seconds.'
-    ]);
-    exit;
+if ($fp && flock($fp, LOCK_EX)) {
+    $fileContent = stream_get_contents($fp);
+    $data = ['count' => 0, 'start' => $now];
+    if ($fileContent) {
+        $json = json_decode($fileContent, true);
+        if (is_array($json)) {
+            $data = $json;
+        }
+    }
+    if ($now - $data['start'] > $window) {
+        $data = ['count' => 1, 'start' => $now];
+    } else {
+        $data['count']++;
+    }
+    if ($data['count'] > $limit) {
+        flock($fp, LOCK_UN);
+        fclose($fp);
+        
+        http_response_code(429);
+        header('Content-Type: application/json');
+        header('Retry-After: ' . $window);
+        echo json_encode([
+            'error' => 'Too Many Requests',
+            'message' => "Rate limit exceeded. Max $limit requests per $window seconds."
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    ftruncate($fp, 0);
+    rewind($fp);
+    fwrite($fp, json_encode($data));
+    flock($fp, LOCK_UN);
 }
+fclose($fp);
+// --- END RATE LIMITER ---
 
 header('Content-Type: application/json');
 $file = __DIR__ . '/../data/client_secret_oauth.json';
