@@ -20,6 +20,9 @@ unzip -o suitecrm-custom.zip -d /path/to/suitecrm7/
 **Files bị ghi đè**:
 - `custom/modules/logic_hooks.php` - Có chứa Push Notification Hook
 
+**Hành động cần chú ý**:
+- Copy `custom/Api/index.php` sang root project có thể backup lại file `Api/index.php` cũ cho chắc chắn
+
 ### 🔑 Bước 2: OAuth2 Client (BẮT BUỘC)
 
 **2.1. Tạo private key và public key:**
@@ -228,4 +231,4 @@ const response = await fetch('/Api/V8/custom/expo-token/save', {
 
 ---
 
-**Version:** 1.0.0 | **SuiteCRM:** 7.x | **Updated:** 05/11/2025
+**Version:** 1.0.0 | **SuiteCRM:** 7.x | **Updated:** 26/01/2025
