@@ -4,13 +4,9 @@
 // Chỉ áp dụng cho access_token
 if (isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'access_token') !== false) {
     
-    $limit = 5;
+    $limit = 30;
     $window = 60;
     $tmpDir = __DIR__ . '/../custom/public/tmp'; 
-
-    if (!is_dir($tmpDir)) {
-        mkdir($tmpDir, 0770, true);
-    }
 
     // Lấy IP chuẩn xác hơn
     $ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? 'unknown';

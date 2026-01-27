@@ -22,6 +22,7 @@ unzip -o suitecrm-custom.zip -d /path/to/suitecrm7/
 
 **Hành động cần chú ý**:
 - Copy `custom/Api/index.php` sang root project có thể backup lại file `Api/index.php` cũ cho chắc chắn
+- Gõ `crontab -e` để cấu hình dọn dẹp thư mục custom/public/tmp sau mỗi 10 phút, chèn dòng này vào: `*/10 * * * * find /var/www/html/<suitecrm>/custom/public/tmp -name "ratelimit_*" -type f -mmin +10 -delete`
 
 ### 🔑 Bước 2: OAuth2 Client (BẮT BUỘC)
 

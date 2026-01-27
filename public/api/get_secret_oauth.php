@@ -3,7 +3,6 @@
 //--- START RATE LIMITER ---
 $limit = 30;
 $window = 60;
-// $tmpDir = sys_get_temp_dir();
 $tmpDir = __DIR__ . '/../tmp';
 
 if (!is_dir($tmpDir)) {
