@@ -1,7 +1,6 @@
 <?php
 
 // --- START RATE LIMITER CUSTOM ---
-// Chỉ áp dụng cho access_token
 if (isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'access_token') !== false) {
     
     $limit = 30;
@@ -15,7 +14,6 @@ if (isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'access_to
     }
     $ip = trim($ip);
 
-    // Hash tên file để bảo mật path
     $cacheFile = $tmpDir . '/ratelimit_' . md5($ip . 'access_token');
     $now = time();
 
@@ -32,14 +30,12 @@ if (isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'access_to
             }
         }
 
-        // Reset bộ đếm nếu qua cửa sổ thời gian
         if ($now - $data['start'] > $window) {
             $data = ['count' => 1, 'start' => $now];
         } else {
             $data['count']++;
         }
 
-        // Kiểm tra giới hạn
         if ($data['count'] > $limit) {
             flock($fp, LOCK_UN);
             fclose($fp);

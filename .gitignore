@@ -22,8 +22,8 @@ modulebuilder
 modules/*
 !modules/*/logic_hooks.php
 # Cho phép toàn bộ thư mục Employees
-!modules/Employees/
-!modules/Employees/**
+# !modules/Employees/
+# !modules/Employees/**
 
 !themes/SuiteP/tpls
 
