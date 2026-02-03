@@ -27,4 +27,8 @@ modules/*
 
 !themes/SuiteP/tpls
 
+themes/default/
+metadata/
+copy
+
 working

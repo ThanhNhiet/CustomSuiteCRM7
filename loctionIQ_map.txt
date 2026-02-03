@@ -441,7 +441,7 @@ if(!defined('sugarEntry') || !sugarEntry) die('Not A Valid Entry Point');
 
 require_once('include/MVC/View/SugarView.php');
 
-class ViewLocationiqmappopup extends SugarView
+class Sgt_vesselsViewLocationiqmappopup extends SugarView
 {
     public function __construct()
     {
@@ -450,7 +450,8 @@ class ViewLocationiqmappopup extends SugarView
 
     public function display()
     {
-        $address = $_GET['address'] ?? '';
+        $rawAddress = $_GET['address'] ?? '';
+        $jsonAddress = json_encode($rawAddress);
         
         echo '<!DOCTYPE html>
 <html>
@@ -462,132 +463,157 @@ class ViewLocationiqmappopup extends SugarView
         body { margin: 0; padding: 10px; font-family: Arial, sans-serif; }
         #map { height: 700px; width: 100%; border: 1px solid #ccc; margin-top: 10px; }
         .address-info { background: #f5f5f5; padding: 8px; border: 1px solid #ddd; margin-bottom: 8px; font-size: 14px; }
-        .loading { text-align: center; padding: 20px; }
+        .loading { text-align: center; padding: 20px; font-style: italic; color: #666; }
+        .error-msg { color: red; display: none; padding: 10px; text-align: center;}
     </style>
 </head>
 <body>
     <div class="address-info">
-        <strong>Address:</strong> ' . htmlspecialchars($address) . '
+        <strong>Input:</strong> ' . htmlspecialchars($rawAddress) . '
     </div>
     
-    <div id="loading" class="loading">Loading map...</div>
+    <div id="loading" class="loading">Processing data...</div>
+    <div id="error" class="error-msg"></div>
     <div id="map"></div>
     
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script>
-        // LocationIQ API key
-        const LOCATIONIQ_API_KEY = "blablabla";
-        const address = "' . addslashes($address) . '";
+        // CONFIG: API KEY
+        const LOCATIONIQ_API_KEY = "blablabla"; 
         
-        // Initialize map with default coordinates and 30m zoom
-        var map = L.map("map").setView([10.8231, 106.6297], 19); // Ho Chi Minh City, 30m zoom
+        // Get safe data from PHP
+        const rawInput = ' . $jsonAddress . ';
         
-        // Add tile layer
+        // Init Map (Default: HCM City)
+        var map = L.map("map").setView([10.8231, 106.6297], 13);
+        
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            attribution: "&copy; <a href=\\"https://www.openstreetmap.org/copyright\\">OpenStreetMap</a> contributors"
+            attribution: "&copy; OpenStreetMap contributors"
         }).addTo(map);
-        
-        // Geocoding with LocationIQ API
-        if (address && address.trim() !== "") {
-            // console.log("Searching for address:", address);
-            
-            // Normalize address for Vietnam
-            var vietnamAddress = address;
-            if (!address.toLowerCase().includes("vietnam") && !address.toLowerCase().includes("viet nam")) {
-                vietnamAddress += ", Vietnam";
+
+        // Check if input is Lat,Lon
+        function isCoordinate(str) {
+            const coordRegex = /^(-?\d+(\.\d+)?)[,\s]+(-?\d+(\.\d+)?)$/;
+            const match = str.trim().match(coordRegex);
+            if (match) {
+                return {
+                    lat: parseFloat(match[1]),
+                    lon: parseFloat(match[3])
+                };
             }
+            return null;
+        }
+
+        function initMap() {
+            if (!rawInput || rawInput.trim() === "") {
+                document.getElementById("loading").style.display = "none";
+                return;
+            }
+
+            const coords = isCoordinate(rawInput);
             
-            // Use LocationIQ API
-            const locationiqUrl = `https://us1.locationiq.com/v1/search?key=${LOCATIONIQ_API_KEY}&q=${encodeURIComponent(vietnamAddress)}&format=json&limit=5`;
-            // console.log("LocationIQ API URL:", locationiqUrl);
+            if (coords) {
+                // CASE 1: COORDINATES INPUT -> REVERSE GEOCODING
+                // We need to call API to get the address name from coords
+                document.getElementById("loading").innerText = "Reverse geocoding coordinates...";
+                
+                const reverseUrl = `https://us1.locationiq.com/v1/reverse?key=${LOCATIONIQ_API_KEY}&lat=${coords.lat}&lon=${coords.lon}&format=json`;
+                
+                fetch(reverseUrl)
+                    .then(r => r.json())
+                    .then(data => {
+                        document.getElementById("loading").style.display = "none";
+                        if (data && !data.error) {
+                            showMarker(coords.lat, coords.lon, data.display_name, "Coordinate Result");
+                        } else {
+                            // Fallback if reverse lookup fails: just show coords
+                            showMarker(coords.lat, coords.lon, "Unknown Address", "Coordinate Result");
+                        }
+                    })
+                    .catch(err => {
+                        console.error("Reverse Geocoding Error", err);
+                        showMarker(coords.lat, coords.lon, "Network Error", "Coordinate Result");
+                        document.getElementById("loading").style.display = "none";
+                    });
+
+            } else {
+                // CASE 2: TEXT INPUT -> FORWARD SEARCH
+                document.getElementById("loading").innerText = "Searching address...";
+                
+                // Normalize address for Vietnam
+                var searchAddress = rawInput;
+                // console.log("Searching for address:", searchAddress);
+
+                const searchUrl = `https://us1.locationiq.com/v1/search?key=${LOCATIONIQ_API_KEY}&q=${encodeURIComponent(searchAddress)}&format=json&limit=3`;
+
+                fetch(searchUrl)
+                    .then(r => {
+                        if (!r.ok) throw new Error(r.statusText);
+                        return r.json();
+                    })
+                    .then(data => {
+                        document.getElementById("loading").style.display = "none";
+                        if (data && data.length > 0) {
+                            const place = data[0];
+                            showMarker(place.lat, place.lon, place.display_name, "Search Result");
+                        } else {
+                            handleNotFound();
+                        }
+                    })
+                    .catch(err => {
+                        console.error("Search Error:", err);
+                        // Fallback to Nominatim (OSM free)
+                        fallbackNominatim(searchAddress);
+                    });
+            }
+        }
+
+        // Helper to show marker and popup
+        function showMarker(lat, lon, addressText, title) {
+            const floatLat = parseFloat(lat);
+            const floatLon = parseFloat(lon);
             
-            fetch(locationiqUrl)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`LocationIQ API error: ${response.status} ${response.statusText}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // console.log("LocationIQ result:", data);
-                    document.getElementById("loading").style.display = "none";
-                    
-                    if (data && data.length > 0) {
-                        const lat = parseFloat(data[0].lat);
-                        const lon = parseFloat(data[0].lon);
-                        
-                        // console.log("Found coordinates:", lat, lon);
-                        
-                        // Set view and add marker with 30m zoom
-                        map.setView([lat, lon], 19);
-                        L.marker([lat, lon])
-                            .addTo(map)
-                            .bindPopup(`<strong>${address}</strong><br>${data[0].display_name}<br><small>Powered by LocationIQ</small>`)
-                            .openPopup();
-                    } else {
-                        // Fallback: show general area if address not found
-                        // console.log("Address not found, showing general area");
-                        map.setView([10.8231, 106.6297], 17);
-                        L.marker([10.8231, 106.6297])
-                            .addTo(map)
-                            .bindPopup(`<strong>General Area</strong><br>Address not found: ${address}`)
-                            .openPopup();
-                    }
-                })
-                .catch(error => {
-                    console.error("LocationIQ API error:", error);
-                    document.getElementById("loading").style.display = "none";
-                    
-                    // Fallback to Nominatim if LocationIQ fails
-                    // console.log("Fallback to Nominatim...");
-                    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(vietnamAddress)}&countrycodes=vn&limit=5`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data && data.length > 0) {
-                                const lat = parseFloat(data[0].lat);
-                                const lon = parseFloat(data[0].lon);
-                                
-                                map.setView([lat, lon], 19);
-                                L.marker([lat, lon])
-                                    .addTo(map)
-                                    .bindPopup(`<strong>${address}</strong><br>${data[0].display_name}<br><small>Fallback: OpenStreetMap</small>`)
-                                    .openPopup();
-                            } else {
-                                map.setView([10.8231, 106.6297], 17);
-                                L.marker([10.8231, 106.6297])
-                                    .addTo(map)
-                                    .bindPopup(`<strong>API Error</strong><br>Showing general area for: ${address}`)
-                                    .openPopup();
-                            }
-                        })
-                        .catch(fallbackError => {
-                            console.error("Fallback error:", fallbackError);
-                            map.setView([10.8231, 106.6297], 17);
-                            L.marker([10.8231, 106.6297])
-                                .addTo(map)
-                                .bindPopup(`<strong>API Error</strong><br>Showing general area for: ${address}`)
-                                .openPopup();
-                        });
-                });
-        } else {
-            document.getElementById("loading").style.display = "none";
-            // Show default location if no address
-            L.marker([10.8231, 106.6297])
+            map.setView([floatLat, floatLon], 18);
+            L.marker([floatLat, floatLon])
                 .addTo(map)
-                .bindPopup("Default Location")
+                .bindPopup(`<strong>${title}</strong><br>${addressText}`)
                 .openPopup();
         }
+
+        // Fallback provider (Nominatim)
+        function fallbackNominatim(query) {
+             document.getElementById("loading").innerText = "Trying fallback provider...";
+             fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`)
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById("loading").style.display = "none";
+                    if(data && data.length > 0) {
+                        showMarker(data[0].lat, data[0].lon, data[0].display_name, "Fallback Result");
+                    } else {
+                        handleNotFound();
+                    }
+                })
+                .catch(() => handleNotFound());
+        }
+
+        // Error Handler
+        function handleNotFound() {
+            document.getElementById("loading").style.display = "none";
+            document.getElementById("error").style.display = "block";
+            document.getElementById("error").innerText = "Location not found. Showing general area.";
+            map.setView([10.8231, 106.6297], 12);
+        }
         
-        // Add click functionality to get coordinates
+        // Click map to get coordinates
         map.on("click", function(e) {
-            const lat = e.latlng.lat.toFixed(6);
-            const lng = e.latlng.lng.toFixed(6);
-            
             L.popup()
                 .setLatLng(e.latlng)
-                .setContent(`Coordinates: ${lat}, ${lng}`)
+                .setContent(`Coordinates: ${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`)
                 .openOn(map);
         });
+
+        // Run
+        initMap();
     </script>
 </body>
 </html>';
