@@ -1,0 +1,647 @@
+**custom/modules/Accounts/metadata/detailviewdefs.php
+<?php
+$viewdefs['Accounts']['DetailView'] = array(
+    'templateMeta' => array(
+        'maxColumns' => '2',
+        'widths' => array(
+            array('label' => '10', 'field' => '30'),
+            array('label' => '10', 'field' => '30'),
+        ),
+        'includes' => array(
+            array('file' => 'custom/modules/Accounts/js/locationiq_map.js'),
+            array('file' => 'custom/modules/Accounts/css/map_button.css'),
+        ),
+    ),
+    'panels' => array(
+        'default' => array(
+            array(
+                'name',
+                array(
+                    'name' => 'view_map_button',
+                    'label' => 'LBL_VIEW_MAP',
+                    'displayParams' => array(
+                        'type' => 'button',
+                        'call_back_function' => 'openLocationIQMap',
+                        'form_id' => 'DetailView',
+                    ),
+                    'customCode' => '<input type="button" class="button" id="view_map_btn" value="View Map" onclick="openLocationIQMap();" />',
+                ),
+            ),
+            array(
+                'phone_office',
+                'website',
+            ),
+            array(
+                'phone_fax',
+                'ticker_symbol',
+            ),
+            array(
+                'account_type',
+                'industry',
+            ),
+            array(
+                'annual_revenue',
+                'employees',
+            ),
+            array(
+                'ownership',
+                'rating',
+            ),
+            array(
+                'billing_address_street',
+                'shipping_address_street',
+            ),
+            array(
+                'billing_address_city',
+                'shipping_address_city',
+            ),
+            array(
+                'billing_address_state',
+                'shipping_address_state',
+            ),
+            array(
+                'billing_address_postalcode',
+                'shipping_address_postalcode',
+            ),
+            array(
+                'billing_address_country',
+                'shipping_address_country',
+            ),
+            array(
+                'description',
+            ),
+            array(
+                'assigned_user_name',
+                'date_entered',
+            ),
+            array(
+                'team_name',
+                'date_modified',
+            ),
+        ),
+    ),
+);
+
+v2:
+<?php
+
+$viewdefs ['Accounts'] =
+array(
+  'DetailView' =>
+  array(
+    'templateMeta' =>
+    array(
+      'form' =>
+      array(
+        'buttons' =>
+        array(
+            'SEND_CONFIRM_OPT_IN_EMAIL' => EmailAddress::getSendConfirmOptInEmailActionLinkDefs('Accounts'),
+          0 => 'EDIT',
+          1 => 'DUPLICATE',
+          2 => 'DELETE',
+          3 => 'FIND_DUPLICATES',
+          'AOS_GENLET' =>
+          array(
+            'customCode' => '<input type="button" class="button" onClick="showPopup();" value="{$APP.LBL_PRINT_AS_PDF}">',
+          ),
+        ),
+      ),
+      'maxColumns' => '2',
+      'widths' =>
+      array(
+        0 =>
+        array(
+          'label' => '10',
+          'field' => '30',
+        ),
+        1 =>
+        array(
+          'label' => '10',
+          'field' => '30',
+        ),
+      ),
+      'includes' =>
+      array(
+        0 =>
+        array(
+          'file' => 'modules/Accounts/Account.js',
+        ),
+        //Include custom JS and CSS for LocationIQ map button
+        1 =>
+        array(
+          'file' => 'custom/modules/Accounts/js/locationiq_map.js',
+        ),
+        2 =>
+        array(
+          'file' => 'custom/modules/Accounts/css/map_button.css',
+        ),
+        //End include
+      ),
+      'useTabs' => true,
+      'tabDefs' =>
+      array(
+        'LBL_ACCOUNT_INFORMATION' =>
+        array(
+          'newTab' => true,
+          'panelDefault' => 'expanded',
+        ),
+        'LBL_PANEL_ADVANCED' =>
+        array(
+          'newTab' => true,
+          'panelDefault' => 'expanded',
+        ),
+        'LBL_PANEL_ASSIGNMENT' =>
+        array(
+          'newTab' => true,
+          'panelDefault' => 'expanded',
+        ),
+      ),
+    ),
+    'panels' =>
+    array(
+      'lbl_account_information' =>
+      array(
+        0 =>
+        array(
+          0 =>
+          array(
+            'name' => 'name',
+            'comment' => 'Name of the Company',
+            'label' => 'LBL_NAME',
+          ),
+          1 =>
+          array(
+            'name' => 'phone_office',
+            'comment' => 'The office phone number',
+            'label' => 'LBL_PHONE_OFFICE',
+          ),
+        ),
+        1 =>
+        array(
+          0 =>
+          array(
+            'name' => 'website',
+            'type' => 'link',
+            'label' => 'LBL_WEBSITE',
+            'displayParams' =>
+            array(
+              'link_target' => '_blank',
+            ),
+          ),
+          1 =>
+          array(
+            'name' => 'phone_fax',
+            'comment' => 'The fax phone number of this company',
+            'label' => 'LBL_FAX',
+          ),
+        ),
+        2 =>
+        array(
+          0 =>
+          array(
+            'name' => 'email1',
+            'studio' => 'false',
+            'label' => 'LBL_EMAIL',
+          ),
+        ),
+        3 =>
+        array(
+          0 =>
+          array(
+            'name' => 'billing_address_street',
+            'label' => 'LBL_BILLING_ADDRESS',
+            'type' => 'address',
+            'displayParams' =>
+            array(
+              'key' => 'billing',
+            ),
+          ),
+          1 =>
+          array(
+            'name' => 'shipping_address_street',
+            'label' => 'LBL_SHIPPING_ADDRESS',
+            'type' => 'address',
+            'displayParams' =>
+            array(
+              'key' => 'shipping',
+            ),
+          ),
+        ),
+        4 =>
+        array(
+          0 =>
+          array(
+            'name' => 'description',
+            'comment' => 'Full text of the note',
+            'label' => 'LBL_DESCRIPTION',
+          ),
+        ),
+        5 =>
+        array(
+          0 =>
+          array(
+            'name' => 'assigned_user_name',
+            'label' => 'LBL_ASSIGNED_TO',
+          ),
+        ),
+        //new row for Map button
+        6 =>
+        array(
+          0 =>
+          array(
+            'name' => 'view_map_button',
+            'label' => 'LBL_VIEW_MAP',
+            'displayParams' => array(
+              'type' => 'button',
+              'call_back_function' => 'openLocationIQMap',
+              'form_id' => 'DetailView',
+            ),
+            'customCode' => '<input type="button" class="button" id="view_map_btn" value="View Map" onclick="openLocationIQMap();" />',
+          ),
+        ),
+        //end new row for Map button
+      ),
+      'LBL_PANEL_ADVANCED' =>
+      array(
+        0 =>
+        array(
+          0 =>
+          array(
+            'name' => 'account_type',
+            'comment' => 'The Company is of this type',
+            'label' => 'LBL_TYPE',
+          ),
+          1 =>
+          array(
+            'name' => 'industry',
+            'comment' => 'The company belongs in this industry',
+            'label' => 'LBL_INDUSTRY',
+          ),
+        ),
+        1 =>
+        array(
+          0 =>
+          array(
+            'name' => 'annual_revenue',
+            'comment' => 'Annual revenue for this company',
+            'label' => 'LBL_ANNUAL_REVENUE',
+          ),
+          1 =>
+          array(
+            'name' => 'employees',
+            'comment' => 'Number of employees, varchar to accomodate for both number (100) or range (50-100)',
+            'label' => 'LBL_EMPLOYEES',
+          ),
+        ),
+        2 =>
+        array(
+          0 =>
+          array(
+            'name' => 'parent_name',
+            'label' => 'LBL_MEMBER_OF',
+          ),
+        ),
+        3 =>
+        array(
+          0 => 'campaign_name',
+        ),
+      ),
+      'LBL_PANEL_ASSIGNMENT' =>
+      array(
+        0 =>
+        array(
+          0 =>
+          array(
+            'name' => 'date_entered',
+            'customCode' => '{$fields.date_entered.value} {$APP.LBL_BY} {$fields.created_by_name.value}',
+          ),
+          1 =>
+          array(
+            'name' => 'date_modified',
+            'label' => 'LBL_DATE_MODIFIED',
+            'customCode' => '{$fields.date_modified.value} {$APP.LBL_BY} {$fields.modified_by_name.value}',
+          ),
+        ),
+      ),
+    ),
+  ),
+);
+
+
+**custom/modules/Accounts/js/locationiq_map.js
+function openLocationIQMap() {
+    // Get address values from form using multiple methods
+    var street = '';
+    var city = '';
+    var country = '';
+    
+    // Method 1: Try direct ID
+    if (document.getElementById('billing_address_street')) {
+        street = document.getElementById('billing_address_street').value || document.getElementById('billing_address_street').innerHTML || '';
+    }
+    if (document.getElementById('billing_address_city')) {
+        city = document.getElementById('billing_address_city').value || document.getElementById('billing_address_city').innerHTML || '';
+    }
+    if (document.getElementById('billing_address_country')) {
+        country = document.getElementById('billing_address_country').value || document.getElementById('billing_address_country').innerHTML || '';
+    }
+    
+    // Method 2: Try by name attribute
+    if (!street) {
+        var streetField = document.querySelector('input[name="billing_address_street"], span[field="billing_address_street"], td[field="billing_address_street"]');
+        if (streetField) street = streetField.value || streetField.innerHTML || streetField.textContent || '';
+    }
+    if (!city) {
+        var cityField = document.querySelector('input[name="billing_address_city"], span[field="billing_address_city"], td[field="billing_address_city"]');
+        if (cityField) city = cityField.value || cityField.innerHTML || cityField.textContent || '';
+    }
+    if (!country) {
+        var countryField = document.querySelector('input[name="billing_address_country"], span[field="billing_address_country"], td[field="billing_address_country"]');
+        if (countryField) country = countryField.value || countryField.innerHTML || countryField.textContent || '';
+    }
+    
+    // Method 3: Search in page content
+    if (!street || !city) {
+        var allElements = document.querySelectorAll('td, span, div');
+        for (var i = 0; i < allElements.length; i++) {
+            var text = allElements[i].textContent || allElements[i].innerHTML || '';
+            if (text.length > 5 && text.length < 100) {
+                // Look for street patterns
+                if (!street && (text.match(/\d+/) || text.toLowerCase().includes('street') || text.toLowerCase().includes('road'))) {
+                    street = text.trim();
+                }
+                // Look for city patterns  
+                if (!city && (text.toLowerCase().includes('city') || text.toLowerCase().includes('minh') || text.toLowerCase().includes('hanoi'))) {
+                    city = text.trim();
+                }
+            }
+        }
+    }
+    
+    // Debug output
+    console.log('Street:', street);
+    console.log('City:', city);
+    console.log('Country:', country);
+    
+    // Build full address
+    var fullAddress = '';
+    if (street && street.trim()) fullAddress += street.trim() + ', ';
+    if (city && city.trim()) fullAddress += city.trim() + ', ';
+    if (country && country.trim()) fullAddress += country.trim();
+    
+    // Fallback: search all page content for address patterns
+    if (fullAddress.trim() === '') {
+        var allElements = document.querySelectorAll('td, span, div');
+        for (var i = 0; i < allElements.length; i++) {
+            var text = allElements[i].textContent || '';
+            if (text.length > 10 && text.length < 150) {
+                // Add any text that might be an address
+                fullAddress += text.trim() + ' ';
+            }
+        }
+        // Clean up and limit to reasonable address
+        if (fullAddress.length > 200) {
+            fullAddress = fullAddress.substring(0, 200);
+        }
+    }
+    
+    if (fullAddress.trim() === '') {
+        alert('Unable to read address data. Please check billing address fields.');
+        return;
+    }
+    
+    // Open LocationIQ map popup
+    var popupUrl = 'index.php?module=Accounts&action=locationIQMapPopup&address=' + encodeURIComponent(fullAddress.trim());
+    var popup = window.open(popupUrl, 'LocationIQMap', 'width=1200,height=600,scrollbars=yes,resizable=yes,left=30,top=50');
+    popup.focus();
+}
+
+
+**custom/modules/Accounts/controller.php
+<?php
+
+require_once 'include/MVC/Controller/SugarController.php';
+
+class AccountsController extends SugarController
+{
+    public function action_locationIQMapPopup()
+    {
+        require_once 'custom/modules/Accounts/views/view.locationiqmappopup.php';
+        $view = new ViewLocationiqmappopup();
+        $view->display();
+        exit();
+    }
+}
+
+
+**custom/modules/Accounts/views/view.locationiqmappopup.php
+<?php
+
+if(!defined('sugarEntry') || !sugarEntry) die('Not A Valid Entry Point');
+
+require_once('include/MVC/View/SugarView.php');
+
+class Sgt_vesselsViewLocationiqmappopup extends SugarView
+{
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    public function display()
+    {
+        $rawAddress = $_GET['address'] ?? '';
+        $jsonAddress = json_encode($rawAddress);
+        
+        echo '<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>LocationIQ Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        body { margin: 0; padding: 10px; font-family: Arial, sans-serif; }
+        #map { height: 700px; width: 100%; border: 1px solid #ccc; margin-top: 10px; }
+        .address-info { background: #f5f5f5; padding: 8px; border: 1px solid #ddd; margin-bottom: 8px; font-size: 14px; }
+        .loading { text-align: center; padding: 20px; font-style: italic; color: #666; }
+        .error-msg { color: red; display: none; padding: 10px; text-align: center;}
+    </style>
+</head>
+<body>
+    <div class="address-info">
+        <strong>Input:</strong> ' . htmlspecialchars($rawAddress) . '
+    </div>
+    
+    <div id="loading" class="loading">Processing data...</div>
+    <div id="error" class="error-msg"></div>
+    <div id="map"></div>
+    
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // CONFIG: API KEY
+        const LOCATIONIQ_API_KEY = "blablabla"; 
+        
+        // Get safe data from PHP
+        const rawInput = ' . $jsonAddress . ';
+        
+        // Init Map (Default: HCM City)
+        var map = L.map("map").setView([10.8231, 106.6297], 13);
+        
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: "&copy; OpenStreetMap contributors"
+        }).addTo(map);
+
+        // Check if input is Lat,Lon
+        function isCoordinate(str) {
+            const coordRegex = /^(-?\d+(\.\d+)?)[,\s]+(-?\d+(\.\d+)?)$/;
+            const match = str.trim().match(coordRegex);
+            if (match) {
+                return {
+                    lat: parseFloat(match[1]),
+                    lon: parseFloat(match[3])
+                };
+            }
+            return null;
+        }
+
+        function initMap() {
+            if (!rawInput || rawInput.trim() === "") {
+                document.getElementById("loading").style.display = "none";
+                return;
+            }
+
+            const coords = isCoordinate(rawInput);
+            
+            if (coords) {
+                // CASE 1: COORDINATES INPUT -> REVERSE GEOCODING
+                // We need to call API to get the address name from coords
+                document.getElementById("loading").innerText = "Reverse geocoding coordinates...";
+                
+                const reverseUrl = `https://us1.locationiq.com/v1/reverse?key=${LOCATIONIQ_API_KEY}&lat=${coords.lat}&lon=${coords.lon}&format=json`;
+                
+                fetch(reverseUrl)
+                    .then(r => r.json())
+                    .then(data => {
+                        document.getElementById("loading").style.display = "none";
+                        if (data && !data.error) {
+                            showMarker(coords.lat, coords.lon, data.display_name, "Coordinate Result");
+                        } else {
+                            // Fallback if reverse lookup fails: just show coords
+                            showMarker(coords.lat, coords.lon, "Unknown Address", "Coordinate Result");
+                        }
+                    })
+                    .catch(err => {
+                        console.error("Reverse Geocoding Error", err);
+                        showMarker(coords.lat, coords.lon, "Network Error", "Coordinate Result");
+                        document.getElementById("loading").style.display = "none";
+                    });
+
+            } else {
+                // CASE 2: TEXT INPUT -> FORWARD SEARCH
+                document.getElementById("loading").innerText = "Searching address...";
+                
+                // Normalize address for Vietnam
+                var searchAddress = rawInput;
+                // console.log("Searching for address:", searchAddress);
+
+                const searchUrl = `https://us1.locationiq.com/v1/search?key=${LOCATIONIQ_API_KEY}&q=${encodeURIComponent(searchAddress)}&format=json&limit=3`;
+
+                fetch(searchUrl)
+                    .then(r => {
+                        if (!r.ok) throw new Error(r.statusText);
+                        return r.json();
+                    })
+                    .then(data => {
+                        document.getElementById("loading").style.display = "none";
+                        if (data && data.length > 0) {
+                            const place = data[0];
+                            showMarker(place.lat, place.lon, place.display_name, "Search Result");
+                        } else {
+                            handleNotFound();
+                        }
+                    })
+                    .catch(err => {
+                        console.error("Search Error:", err);
+                        // Fallback to Nominatim (OSM free)
+                        fallbackNominatim(searchAddress);
+                    });
+            }
+        }
+
+        // Helper to show marker and popup
+        function showMarker(lat, lon, addressText, title) {
+            const floatLat = parseFloat(lat);
+            const floatLon = parseFloat(lon);
+            
+            map.setView([floatLat, floatLon], 18);
+            L.marker([floatLat, floatLon])
+                .addTo(map)
+                .bindPopup(`<strong>${title}</strong><br>${addressText}`)
+                .openPopup();
+        }
+
+        // Fallback provider (Nominatim)
+        function fallbackNominatim(query) {
+             document.getElementById("loading").innerText = "Trying fallback provider...";
+             fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`)
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById("loading").style.display = "none";
+                    if(data && data.length > 0) {
+                        showMarker(data[0].lat, data[0].lon, data[0].display_name, "Fallback Result");
+                    } else {
+                        handleNotFound();
+                    }
+                })
+                .catch(() => handleNotFound());
+        }
+
+        // Error Handler
+        function handleNotFound() {
+            document.getElementById("loading").style.display = "none";
+            document.getElementById("error").style.display = "block";
+            document.getElementById("error").innerText = "Location not found. Showing general area.";
+            map.setView([10.8231, 106.6297], 12);
+        }
+        
+        // Click map to get coordinates
+        map.on("click", function(e) {
+            L.popup()
+                .setLatLng(e.latlng)
+                .setContent(`Coordinates: ${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`)
+                .openOn(map);
+        });
+
+        // Run
+        initMap();
+    </script>
+</body>
+</html>';
+    }
+}
+
+**custom/modules/Accounts/css/map_button.css
+#view_map_btn {
+    background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+#view_map_btn:hover {
+    background: linear-gradient(135deg, #357abd 0%, #2868a3 100%);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    transform: translateY(-1px);
+}
+
+#view_map_btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
