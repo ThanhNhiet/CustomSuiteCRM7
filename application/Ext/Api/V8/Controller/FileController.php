@@ -434,6 +434,127 @@ class FileController
     }
     
     /**
+     * Upload file API endpoint without record ID
+     * 
+     * @param Request $request
+     * @param Response $response
+     * @param array $args
+     * @return Response
+     */
+    public function uploadFileWithoutId(Request $request, Response $response, array $args)
+    {
+        $moduleName = $args['module'] ?? null;
+        
+        // Validate input - only module name is required
+        if (empty($moduleName)) {
+            return $this->errorResponse($response, 'Missing required parameter: module', 400);
+        }
+        
+        // Get uploaded files from the request
+        $uploadedFiles = $request->getUploadedFiles();
+        
+        // Check if file was uploaded
+        if (!isset($uploadedFiles['file'])) {
+            return $this->errorResponse($response, 'No file uploaded', 400);
+        }
+        
+        $file = $uploadedFiles['file'];
+        
+        // Check for upload errors
+        if ($file->getError() !== UPLOAD_ERR_OK) {
+            return $this->errorResponse($response, 'File upload failed with error code: ' . $file->getError(), 400);
+        }
+        
+        // Get file information
+        $originalFilename = $file->getClientFilename();
+        $mimeType = $file->getClientMediaType();
+        $extension = pathinfo($originalFilename, PATHINFO_EXTENSION);
+        
+        // Define the upload directory
+        $uploadDir = realpath(dirname(__FILE__) . '/../../../../../../upload/');
+        
+        if (!is_dir($uploadDir) || !is_writable($uploadDir)) {
+            return $this->errorResponse($response, 'Upload directory is not writable', 500);
+        }
+        
+        // Generate unique filename without record ID
+        $targetFilename = $this->generateUniqueFilename($moduleName, $originalFilename, $extension);
+        
+        // Full path to save the file
+        $targetPath = $uploadDir . '/' . $targetFilename;
+        
+        try {
+            // Move the uploaded file to the target location
+            $file->moveTo($targetPath);
+            
+            // Generate URLs
+            $baseUrl = $this->getBaseUrl();
+            $fileUrl = rtrim($baseUrl, '/') . '/upload/' . $targetFilename;
+            $previewUrl = $baseUrl . "/custom/public/file_preview.php?id={$targetFilename}&type={$moduleName}&preview=true";
+            $downloadUrl = $baseUrl . "/custom/public/file_preview.php?id={$targetFilename}&type={$moduleName}&preview=false";
+            
+            // Return success response
+            $result = [
+                'success' => true,
+                'message' => 'File uploaded successfully',
+                'filename' => $targetFilename,
+                'original_filename' => $originalFilename,
+                'mime_type' => $mimeType,
+                'file_url' => $fileUrl,
+                'preview_url' => $previewUrl,
+                'download_url' => $downloadUrl,
+                'file_size' => filesize($targetPath)
+            ];
+            
+            $response->getBody()->write(json_encode($result));
+            return $response->withHeader('Content-Type', 'application/json');
+        } catch (\Exception $e) {
+            return $this->errorResponse($response, 'Failed to save uploaded file: ' . $e->getMessage(), 500);
+        }
+    }
+    
+    /**
+     * Generate a unique filename based on module and timestamp
+     * 
+     * @param string $moduleName
+     * @param string $originalFilename
+     * @param string $extension
+     * @return string
+     */
+    private function generateUniqueFilename($moduleName, $originalFilename, $extension)
+    {
+        // Generate UUID v4
+        $uuid = sprintf(
+            '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+            mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0x0fff) | 0x4000,
+            mt_rand(0, 0x3fff) | 0x8000,
+            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+        );
+        
+        // Generate timestamp
+        $timestamp = date('dmYHis');
+        
+        // Build filename based on module type
+        if ($moduleName === 'AOS_Products') {
+            // For AOS_Products: ddmmyyyyhhmmss_{uuid}.{extension}
+            $targetFilename = $timestamp . '_' . $uuid;
+            if ($extension) {
+                $targetFilename .= '.' . $extension;
+            }
+        } else {
+            // For all other modules: {timestamp}_{uuid}.{extension}
+            $targetFilename = $timestamp . '_' . $uuid;
+            if ($extension) {
+                $targetFilename .= '.' . $extension;
+            }
+        }
+        
+        return $targetFilename;
+    }
+    
+    /**
      * Update file information in the database
      * 
      * @param string $moduleName

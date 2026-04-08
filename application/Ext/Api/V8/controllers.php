@@ -13,6 +13,8 @@ require_once 'custom/application/Ext/Api/V8/Controller/UserGroupsController.php'
 require_once 'custom/application/Ext/Api/V8/Controller/DataTypeController.php';
 require_once 'custom/application/Ext/Api/V8/Controller/FileController.php';
 require_once 'custom/application/Ext/Api/V8/Controller/SetupController.php';
+require_once 'custom/application/Ext/Api/V8/Controller/AttendanceController.php';
+require_once 'custom/application/Ext/Api/V8/Controller/LeaveController.php';
 
 use Api\V8\Controller\UserPasswordController;
 use Api\V8\Controller\ListViewController;
@@ -27,6 +29,8 @@ use Api\V8\Controller\UserGroupsController;
 use Api\V8\Controller\DataTypeController;
 use Api\V8\Controller\FileController;
 use Api\V8\Controller\SetupController;
+use Api\V8\Controller\AttendanceController;
+use Api\V8\Controller\LeaveController;
 use Slim\Container;         
 
 return [
@@ -69,4 +73,11 @@ return [
     SetupController::class => function (Container $container) {
         return new SetupController();
     },
+    AttendanceController::class => function (Container $container) {
+        return new AttendanceController();
+    },
+    LeaveController::class => function (Container $container) {
+        return new LeaveController();
+    },
+
 ];

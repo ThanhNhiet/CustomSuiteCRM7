@@ -14,6 +14,8 @@ use Api\V8\Controller\UserGroupsController;
 use Api\V8\Controller\DataTypeController;
 use Api\V8\Controller\FileController;
 use Api\V8\Controller\SetupController;
+use Api\V8\Controller\AttendanceController;
+use Api\V8\Controller\LeaveController;
 
 $app->get('/username/{id}', UserPasswordController::class . ':getUserInfo');
 
@@ -65,6 +67,8 @@ $app->get('/enum/{module}', DataTypeController::class . ':getModuleEnumOptions')
 // API để lấy relate type
 $app->get('/relate/{module}', DataTypeController::class . ':getModuleRelateType');
 
+// File routes - define specific routes BEFORE generic ones
+$app->post('/file/{module}/uploadFileWithoutId', FileController::class . ':uploadFileWithoutId');
 $app->get('/file/{module}/{id}', FileController::class . ':getFile');
 $app->post('/file/{module}/{id}', FileController::class . ':uploadFile');
 
@@ -74,5 +78,27 @@ $app->post('/setup/save-secret/{user_id}', SetupController::class . ':saveSecret
 // API để lưu danh sách modules và quyền truy cập
 $app->post('/setup/save-modules-list/{user_id}', SetupController::class . ':saveModulesList');
 $app->get('/setup/get-modules-list', SetupController::class . ':getModulesList');
+
+
+// API để lấy attendance records theo attendance_date và emp_no
+$app->get('/attendance/getByDateAndEmployee', AttendanceController::class . ':getAttendanceByDateAndEmployee');
+
+// API để lấy attendance records theo attendance_date
+$app->get('/attendance/getByDate', AttendanceController::class . ':getAttendanceByDate');
+
+// API để lấy attendance records theo emp_no
+$app->get('/attendance/getByEmployee', AttendanceController::class . ':getAttendanceByEmployee');
+
+
+// API để lấy leave records theo emp_no
+$app->get('/leave/getByEmployee', LeaveController::class . ':getLeaveByEmployee');
+// API để lấy leave records theo start_date và end_date
+$app->get('/leave/getByDateRange', LeaveController::class . ':getLeaveByDateRange');
+// API để lấy leave records theo emp_no và date range
+$app->get('/leave/getByEmployeeAndDateRange', LeaveController::class . ':getLeaveByEmployeeAndDateRange');
+// API để lấy leave records theo ma_nv và tinhtrang = 'daduyet' với phân trang
+$app->get('/leave/getByEmployeeAndStatus', LeaveController::class . ':getLeaveByEmployeeAndStatus');
+
+
 
 return $app;
