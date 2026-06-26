@@ -16,6 +16,7 @@ use Api\V8\Controller\FileController;
 use Api\V8\Controller\SetupController;
 use Api\V8\Controller\AttendanceController;
 use Api\V8\Controller\LeaveController;
+use Api\V8\Controller\OvertimeController;
 
 $app->get('/username/{id}', UserPasswordController::class . ':getUserInfo');
 
@@ -69,6 +70,7 @@ $app->get('/relate/{module}', DataTypeController::class . ':getModuleRelateType'
 
 // File routes - define specific routes BEFORE generic ones
 $app->post('/file/{module}/uploadFileWithoutId', FileController::class . ':uploadFileWithoutId');
+$app->post('/file/{module}/sendFileWithoutId', FileController::class . ':sendFileWithoutId');
 $app->get('/file/{module}/{id}', FileController::class . ':getFile');
 $app->post('/file/{module}/{id}', FileController::class . ':uploadFile');
 
@@ -99,6 +101,12 @@ $app->get('/leave/getByEmployeeAndDateRange', LeaveController::class . ':getLeav
 // API để lấy leave records theo ma_nv và tinhtrang = 'daduyet' với phân trang
 $app->get('/leave/getByEmployeeAndStatus', LeaveController::class . ':getLeaveByEmployeeAndStatus');
 
+// API để lấy overtime records theo emp_no
+$app->get('/overtime/getByEmployee', OvertimeController::class . ':getOvertimeByEmployee');
+// API để lấy overtime records theo start_date và end_date
+$app->get('/overtime/getByDateRange', OvertimeController::class . ':getOvertimeByDateRange');
+// API để lấy overtime records theo emp_no và date range
+$app->get('/overtime/getByEmployeeAndDateRange', OvertimeController::class . ':getOvertimeByEmployeeAndDateRange');
 
 
 return $app;

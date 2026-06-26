@@ -31,6 +31,7 @@ use Api\V8\Controller\FileController;
 use Api\V8\Controller\SetupController;
 use Api\V8\Controller\AttendanceController;
 use Api\V8\Controller\LeaveController;
+use Api\V8\Controller\OvertimeController;
 use Slim\Container;         
 
 return [
@@ -79,5 +80,8 @@ return [
     LeaveController::class => function (Container $container) {
         return new LeaveController();
     },
+    OvertimeController::class => function (Container $container) {
+        return new OvertimeController();
+    }
 
 ];

@@ -75,11 +75,14 @@ class AttendanceController
      * Get attendance records by week with pagination
      * Returns attendance records for the entire week containing the given date
      * Supports week offset to navigate between weeks
-     * 
-     * @param Request $request
+     * * @param Request $request
      * @param Response $response
      * @param array $args
      * @return Response
+     */
+   /**
+     * Get attendance records by week with pagination (No week_offset)
+     * Returns attendance records for the entire week containing the given date
      */
     public function getAttendanceByDate(Request $request, Response $response, array $args)
     {
@@ -89,9 +92,13 @@ class AttendanceController
             if (empty($queryParams['attendance_date'])) {
                 return $this->errorResponse($response, 'Parameter "attendance_date" is required', 400);
             }
+
+            if (empty($queryParams['emp_no'])) {
+                return $this->errorResponse($response, 'Parameter "emp_no" is required', 400);
+            }
             
+            $empNo = $queryParams['emp_no'];
             $attendanceDate = $queryParams['attendance_date'];
-            $weekOffset = isset($queryParams['week_offset']) ? (int)$queryParams['week_offset'] : 0;
             
             if (!$this->isValidDate($attendanceDate)) {
                 return $this->errorResponse($response, 'Invalid date format. Expected YYYY-MM-DD', 400);
@@ -99,11 +106,6 @@ class AttendanceController
             
             // Parse the date and calculate week boundaries
             $date = new \DateTime($attendanceDate);
-            
-            // Apply week offset (each offset = 7 days)
-            if ($weekOffset != 0) {
-                $date->modify($weekOffset . ' week');
-            }
             
             // Get Monday of this week (start of week)
             $dayOfWeek = $date->format('N'); // 1 = Monday, 7 = Sunday
@@ -118,15 +120,23 @@ class AttendanceController
             $weekStart = $mondayDate->format('Y-m-d');
             $weekEnd = $sundayDate->format('Y-m-d');
             
+            global $db;
+            
+            // TỐI ƯU BẢO MẬT: Dùng hàm quote() để tự động làm sạch và bọc nháy đơn
+            $safeEmpNo = $db->quote($empNo);
+            $safeWeekStart = $db->quote($weekStart);
+            $safeWeekEnd = $db->quote($weekEnd);
+            
             // Query the database for the entire week
-            $sql = "SELECT id, emp_no, attendance_date,time_in, time_out 
+            $sql = "SELECT id, emp_no, attendance_date, time_in, time_out 
                     FROM sgt_attendance 
-                    WHERE attendance_date >= '{$weekStart}' 
-                    AND attendance_date <= '{$weekEnd}'
+                    WHERE attendance_date >= '{$safeWeekStart}'
+                    AND attendance_date <= '{$safeWeekEnd}'
+                    AND emp_no = '{$safeEmpNo}'
                     AND deleted = 0
                     ORDER BY attendance_date ASC, emp_no ASC";
             
-            global $db;
+            // Ép chạy SQL thuần với tham số thứ hai là true để Bypass ACL của Token chéo
             $result = $db->query($sql, true);
             
             $records = [];
@@ -134,14 +144,21 @@ class AttendanceController
                 $records[] = $row;
             }
             
-            // Calculate previous and next week dates
-            $prevWeekDates = $this->getWeekDates($weekStart, -1);
-            $nextWeekDates = $this->getWeekDates($weekStart, 1);
+            // Tính ngày Thứ Hai của tuần trước và tuần sau trực tiếp bằng DateTime
+            $currentMonday = new \DateTime($weekStart);
             
-            // Get base URL for navigation links
+            $prevMonday = clone $currentMonday;
+            $prevMonday->modify('-7 day');
+            $prevStart = $prevMonday->format('Y-m-d');
+            
+            $nextMonday = clone $currentMonday;
+            $nextMonday->modify('+7 day');
+            $nextStart = $nextMonday->format('Y-m-d');
+            
+            // Khởi tạo base URL cho link điều hướng
             $baseUrl = '/Api/V8/custom/attendance/getByDate';
-            $prevUrl = $baseUrl . '?attendance_date=' . $prevWeekDates['start'];
-            $nextUrl = $baseUrl . '?attendance_date=' . $nextWeekDates['start'];
+            $prevUrl = $baseUrl . '?attendance_date=' . $prevStart . '&emp_no=' . urlencode($empNo);
+            $nextUrl = $baseUrl . '?attendance_date=' . $nextStart . '&emp_no=' . urlencode($empNo);
             
             $responseData = [
                 'success' => true,
@@ -149,14 +166,13 @@ class AttendanceController
                 'count' => count($records),
                 'week_info' => [
                     'week_start' => $weekStart,
-                    'week_end' => $weekEnd,
-                    'current_week_offset' => $weekOffset
+                    'week_end' => $weekEnd
                 ],
                 'prev' => $prevUrl,
                 'next' => $nextUrl,
                 'pagination' => [
-                    'prev_week_dates' => $prevWeekDates,
-                    'next_week_dates' => $nextWeekDates
+                    'prev_week_dates' => ['start' => $prevStart],
+                    'next_week_dates' => ['start' => $nextStart]
                 ]
             ];
             
@@ -164,6 +180,7 @@ class AttendanceController
             return $response->withHeader('Content-Type', 'application/json');
             
         } catch (\Exception $e) {
+            $GLOBALS['log']->fatal("LỖI 500 getAttendanceByDate: " . $e->getMessage());
             return $this->errorResponse($response, 'Error retrieving attendance records: ' . $e->getMessage(), 500);
         }
     }

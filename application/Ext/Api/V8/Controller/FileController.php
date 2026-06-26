@@ -7,19 +7,13 @@ use SugarBean;
 
 /**
  * FileController
- * 
- * Custom API endpoint for serving files from upload directory
- * API endpoint: GET /file/{moduleName}/{id}
+ * Custom API endpoint phục vụ lưu trữ file và tích hợp sinh trắc học Face++ cho App Timekeeping Service
+ * API endpoint: GET/POST /file/{moduleName}/{id}
  */
 class FileController
 {
     /**
      * Get file based on module and record ID
-     * 
-     * @param Request $request
-     * @param Response $response
-     * @param array $args
-     * @return Response
      */
     public function getFile(Request $request, Response $response, array $args)
     {
@@ -28,19 +22,14 @@ class FileController
         $downloadParam = $request->getQueryParams()['download'] ?? false;
         $previewParam = $request->getQueryParams()['preview'] ?? false;
         
-        // Validate input
         if (empty($moduleName) || empty($id)) {
             return $this->errorResponse($response, 'Missing required parameters', 400);
         }
         
-        // Convert module name to lowercase (as mentioned in requirements)
         $moduleNameLower = strtolower($moduleName);
-        
-        // 1. Check if file exists directly with the ID
-        $uploadDir = realpath(dirname(__FILE__) . '/../../../../../../upload/');
+        $uploadDir = '/var/www/html/demo/nhansu/upload';
         $exactFilePath = $this->findFile($uploadDir, $id);
         
-        // If direct ID match not found, try with _photo suffix
         if (empty($exactFilePath)) {
             $exactFilePath = $this->findFile($uploadDir, $id . '_photo');
         }
@@ -49,77 +38,49 @@ class FileController
             return $this->errorResponse($response, "File not found for ID: {$id}", 404);
         }
         
-        // Get the file's MIME type
         $mimeType = $this->getMimeType($exactFilePath, $moduleNameLower, $id);
-        
-        // Get the filename (with extension)
         $filename = $this->getFilename($exactFilePath, $moduleNameLower, $id);
-        
-        // Check if the file is an image for direct preview
         $isImage = $this->isImageFile($mimeType);
-        
-        // Generate file URL
         $baseUrl = $this->getBaseUrl();
-        $fileUrl = rtrim($baseUrl, '/') . '/upload/' . basename($exactFilePath);
         
-        // Check if we need to stream the file directly (download or preview)
         if ($downloadParam === 'true' || $previewParam === 'true') {
             $fileContents = file_get_contents($exactFilePath);
             if ($fileContents === false) {
                 return $this->errorResponse($response, "Unable to read file contents", 500);
             }
             
-            // Set appropriate headers
             $response = $response->withHeader('Content-Type', $mimeType);
-            
-            // For images and preview mode, always use inline disposition
             if ($isImage && $previewParam === 'true') {
-                // For image preview, always show inline
                 $response = $response
                     ->withHeader('Content-Disposition', 'inline; filename="' . $filename . '"')
                     ->withHeader('Content-Length', filesize($exactFilePath))
-                    ->withHeader('Cache-Control', 'public, max-age=86400'); // Cache for one day
+                    ->withHeader('Cache-Control', 'public, max-age=86400');
             } else if ($downloadParam === 'true') {
-                // Force download
                 $response = $response
                     ->withHeader('Content-Disposition', 'attachment; filename="' . $filename . '"')
                     ->withHeader('Content-Length', filesize($exactFilePath));
             } else {
-                // Default behavior for non-images or when no specific param is set
                 $response = $response
                     ->withHeader('Content-Disposition', 'inline; filename="' . $filename . '"')
                     ->withHeader('Content-Length', filesize($exactFilePath));
             }
             
-            // Write file content to the response body
             $response->getBody()->write($fileContents);
             return $response;
         }
         
-        // If not downloading/previewing, return JSON metadata
-        // Get the full filename from the exact file path
         $fileName = basename($exactFilePath);
-        
-        // Construct native SuiteCRM URL with the exact filename
-        $baseUrl = $this->getBaseUrl();
-        
-        // Use our simplified file preview handler
         $nativeUrl = $baseUrl . "/custom/public/file_preview.php?id={$fileName}&type={$moduleName}&preview=true";
-        
-        // Add a download link that forces the file to download
         $downloadUrl = $baseUrl . "/custom/public/file_preview.php?id={$fileName}&type={$moduleName}&preview=false";
         
-        // Add a native SuiteCRM download link using entryPoint as fallback option
-        // This is the standard SuiteCRM download mechanism
         $originalId = $id;
         if (empty(strpos($fileName, '_photo')) && strpos($fileName, $id) === 0) {
-            $originalId = $id; // Use as is if the filename doesn't contain _photo
+            $originalId = $id;
         } elseif (strpos($fileName, '_photo') !== false) {
-            $originalId = $id . '_photo'; // Add _photo suffix if the filename has it
+            $originalId = $id . '_photo';
         }
         $downloadUrlNative = $baseUrl . "/index.php?entryPoint=download&id={$originalId}&type={$moduleName}";
         
-        // Return response
         $result = [
             'success' => true,
             'mime_type' => $mimeType,
@@ -134,56 +95,28 @@ class FileController
         return $response->withHeader('Content-Type', 'application/json');
     }
     
-    /**
-     * Find a file in the upload directory that matches the ID pattern
-     * 
-     * @param string $directory
-     * @param string $searchPattern
-     * @return string|null
-     */
     private function findFile($directory, $searchPattern)
     {
         if (!is_dir($directory)) {
             return null;
         }
-        
-        // Get all files in the directory
         $files = scandir($directory);
-        
         foreach ($files as $file) {
-            // Skip directory entries
             if ($file === '.' || $file === '..') {
                 continue;
             }
-            
-            // Check if the file contains the search pattern
             if (strpos($file, $searchPattern) === 0) {
                 return $directory . '/' . $file;
             }
         }
-        
         return null;
     }
     
-    /**
-     * Get MIME type for the file
-     * First tries to get it from the module record if available,
-     * otherwise falls back to file detection
-     * 
-     * @param string $filePath
-     * @param string $moduleName
-     * @param string $id
-     * @return string
-     */
     private function getMimeType($filePath, $moduleName, $id)
     {
         global $beanList;
-        
-        // Try to get MIME type from the module record
         if (isset($beanList[$moduleName])) {
             $beanClass = $beanList[$moduleName];
-            
-            // Load the bean for this record
             $bean = new $beanClass();
             if ($bean->retrieve($id)) {
                 if (!empty($bean->file_mime_type)) {
@@ -191,39 +124,17 @@ class FileController
                 }
             }
         }
-        
-        // Fallback: use finfo to determine MIME type
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $mimeType = finfo_file($finfo, $filePath);
         finfo_close($finfo);
-        
-        // If still empty, provide a generic default
-        if (empty($mimeType)) {
-            $mimeType = 'application/octet-stream';
-        }
-        
-        return $mimeType;
+        return empty($mimeType) ? 'application/octet-stream' : $mimeType;
     }
     
-    /**
-     * Get filename with extension
-     * First tries to get it from the module record if available,
-     * otherwise uses the basename of the file
-     * 
-     * @param string $filePath
-     * @param string $moduleName
-     * @param string $id
-     * @return string
-     */
     private function getFilename($filePath, $moduleName, $id)
     {
         global $beanList;
-        
-        // Try to get filename from the module record
         if (isset($beanList[$moduleName])) {
             $beanClass = $beanList[$moduleName];
-            
-            // Load the bean for this record
             $bean = new $beanClass();
             if ($bean->retrieve($id)) {
                 if (!empty($bean->filename)) {
@@ -231,190 +142,97 @@ class FileController
                 }
             }
         }
-        
-        // Fallback: use basename
         return basename($filePath);
     }
     
-    /**
-     * Check if the MIME type corresponds to an image
-     * 
-     * @param string $mimeType
-     * @return bool
-     */
     private function isImageFile($mimeType)
     {
         return strpos($mimeType, 'image/') === 0;
     }
     
-    /**
-     * Get base URL for the SuiteCRM instance
-     * Dynamically detects the current server's base URL
-     * 
-     * @return string
-     */
     private function getBaseUrl()
     {
-        // MOBILE DEVELOPMENT CONFIG - CHANGE THIS FOR MOBILE DEVELOPMENT
-        // ---------------------------------------------------------------
-        // Set to true when developing with mobile clients on local network
-        $mobileDevMode = false;
-        
-        // Your computer's local network IPv4 address for mobile development
-        // For example: "192.168.1.100" - Find this using "ipconfig" (Windows) or "ifconfig" (Mac/Linux)
-        $localNetworkIp = "192.168.101.7"; // CHANGE THIS TO YOUR COMPUTER'S IP ADDRESS
-        
-        // Base path of your SuiteCRM installation
-        $suiteBasePath = "/suitecrm7";
-        
-        // If mobile development mode is on, use the local network IP
-        if ($mobileDevMode) {
-            $protocol = "http://"; // Usually http for local development
-            return $protocol . $localNetworkIp . $suiteBasePath;
-        }
-        // ---------------------------------------------------------------
-        
-        // PRODUCTION/NORMAL MODE (Default behavior)
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
         $domainName = $_SERVER['HTTP_HOST'];
-        
-        // Try to detect base path from script name
         $scriptPath = $_SERVER['SCRIPT_NAME'] ?? '';
         $baseDir = '';
         
-        // Extract base path from script name (remove "Api/V8/custom/file/...")
         if (strpos($scriptPath, 'Api') !== false) {
             $baseDir = substr($scriptPath, 0, strpos($scriptPath, 'Api'));
         } else {
-            // Fallback: try to detect from REQUEST_URI
             $requestUri = $_SERVER['REQUEST_URI'] ?? '';
             if (strpos($requestUri, 'Api') !== false) {
                 $baseDir = substr($requestUri, 0, strpos($requestUri, 'Api'));
             }
         }
         
-        // Remove trailing slash if present
         $baseDir = rtrim($baseDir, '/');
-        
-        // Use detected base URL or try to read from config
         if (!empty($baseDir)) {
             return $protocol . $domainName . $baseDir;
         }
         
-        // If we couldn't detect from URL, try to read from sugar config
-        $configFile = dirname(__FILE__) . '/../../../../../../config.php';
+        $configFile = '/var/www/html/demo/nhansu/config.php';
         if (file_exists($configFile)) {
             include_once $configFile;
             if (isset($sugar_config) && isset($sugar_config['site_url'])) {
                 return rtrim($sugar_config['site_url'], '/');
             }
         }
-        
-        // Final fallback: use current hostname with default path
         return $protocol . $domainName;
     }
     
-    /**
-     * Generate error response
-     * 
-     * @param Response $response
-     * @param string $message
-     * @param int $statusCode
-     * @return Response
-     */
-    private function errorResponse(Response $response, $message, $statusCode = 400)
-    {
-        $result = [
-            'success' => false,
-            'message' => $message,
-        ];
-        
-        $response->getBody()->write(json_encode($result));
-        return $response->withHeader('Content-Type', 'application/json')->withStatus($statusCode);
-    }
-    
-    /**
-     * Upload file API endpoint
-     * 
-     * @param Request $request
-     * @param Response $response
-     * @param array $args
-     * @return Response
-     */
     public function uploadFile(Request $request, Response $response, array $args)
     {
         $moduleName = $args['module'];
         $id = $args['id'];
         
-        // Validate input
         if (empty($moduleName) || empty($id)) {
             return $this->errorResponse($response, 'Missing required parameters', 400);
         }
         
-        // Get uploaded files from the request
         $uploadedFiles = $request->getUploadedFiles();
-        
-        // Check if file was uploaded
         if (!isset($uploadedFiles['file'])) {
             return $this->errorResponse($response, 'No file uploaded', 400);
         }
         
         $file = $uploadedFiles['file'];
-        
-        // Check for upload errors
         if ($file->getError() !== UPLOAD_ERR_OK) {
             return $this->errorResponse($response, 'File upload failed with error code: ' . $file->getError(), 400);
         }
         
-        // Get file information
         $originalFilename = $file->getClientFilename();
         $mimeType = $file->getClientMediaType();
         $extension = pathinfo($originalFilename, PATHINFO_EXTENSION);
-        
-        // Define the upload directory
-        $uploadDir = realpath(dirname(__FILE__) . '/../../../../../../upload/');
+        $uploadDir = '/var/www/html/demo/nhansu/upload';
         
         if (!is_dir($uploadDir) || !is_writable($uploadDir)) {
             return $this->errorResponse($response, 'Upload directory is not writable', 500);
         }
         
-        // Generate filename based on module
         $targetFilename = '';
-        
         if ($moduleName === 'AOS_Products') {
-            // For AOS_Products: ddmmyyyyhhmmss_{originalname}.jpg
             $timestamp = date('dmYHis');
             $targetFilename = $timestamp . '_' . $originalFilename;
-            
-            // Keep the original extension based on mime type
             if ($extension) {
                 $targetFilename = substr($targetFilename, 0, strrpos($targetFilename, '.')) . '.' . $extension;
             }
         } elseif ($moduleName === 'Users') {
-            // For Users: {id}_photo (no extension)
             $targetFilename = $id . '_photo';
         } else {
-            // For all other modules: {id} (no extension)
             $targetFilename = $id;
         }
         
-        // Full path to save the file
         $targetPath = $uploadDir . '/' . $targetFilename;
         
         try {
-            // Move the uploaded file to the target location
             $file->moveTo($targetPath);
-            
-            // Update file information in the database if needed
             $this->updateFileInfoInDb($moduleName, $id, $originalFilename, $mimeType);
             
-            // Generate URLs
             $baseUrl = $this->getBaseUrl();
             $fileUrl = rtrim($baseUrl, '/') . '/upload/' . $targetFilename;
             $previewUrl = $baseUrl . "/custom/public/file_preview.php?id={$targetFilename}&type={$moduleName}&preview=true";
             $downloadUrl = $baseUrl . "/custom/public/file_preview.php?id={$targetFilename}&type={$moduleName}&preview=false";
             
-            // Return success response
             $result = [
                 'success' => true,
                 'message' => 'File uploaded successfully',
@@ -434,96 +252,216 @@ class FileController
     }
     
     /**
-     * Upload file API endpoint without record ID
-     * 
-     * @param Request $request
-     * @param Response $response
-     * @param array $args
-     * @return Response
+     * Helper tối ưu & nén ảnh nếu vượt quá dung lượng quy định
      */
-    public function uploadFileWithoutId(Request $request, Response $response, array $args)
+    private function compressImageIfNeeded(string $filePath, string $targetPath, float $maxSizeMb = 1.5): string
+    {
+        $logger = $GLOBALS['log'];
+        if (!file_exists($filePath)) {
+            $logger->warn("Face++ [Compress Helper]: File không tồn tại để kiểm tra kích thước: {$filePath}");
+            return $filePath;
+        }
+
+        $fileSize = filesize($filePath);
+        if ($fileSize <= $maxSizeMb * 1024 * 1024) {
+            $logger->info("Face++ [Compress Helper]: Dung lượng ảnh (" . round($fileSize / 1024) . " KB) dưới mức giới hạn {$maxSizeMb}MB. Không cần nén.");
+            return $filePath;
+        }
+
+        $logger->info("Face++ [Compress Helper]: Tiến hành nén ảnh gốc nặng: " . round($fileSize / 1024) . " KB");
+        $imageInfo = @getimagesize($filePath);
+        $mime = $imageInfo['mime'] ?? 'image/jpeg';
+        $srcImg = null;
+
+        if ($mime == 'image/jpeg' || $mime == 'image/jpg') {
+            $srcImg = @imagecreatefromjpeg($filePath);
+        } elseif ($mime == 'image/png') {
+            $srcImg = @imagecreatefrompng($filePath);
+        }
+
+        if ($srcImg) {
+            $oldW = imagesx($srcImg); 
+            $oldH = imagesy($srcImg);
+            $newW = ($oldW > 1200) ? 1200 : $oldW;
+            $newH = floor($oldH * ($newW / $oldW));
+
+            $canvas = imagecreatetruecolor($newW, $newH);
+            imagecopyresampled($canvas, $srcImg, 0, 0, 0, 0, $newW, $newH, $oldW, $oldH);
+            
+            if (imagejpeg($canvas, $targetPath, 75)) {
+                imagedestroy($srcImg); 
+                imagedestroy($canvas);
+                $logger->info("Face++ [Compress Helper]: Nén thành công! File tạm lưu tại: {$targetPath}, kích thước mới: " . round(filesize($targetPath) / 1024) . " KB");
+                return $targetPath;
+            }
+            imagedestroy($srcImg); 
+            imagedestroy($canvas);
+        }
+        return $filePath;
+    }
+
+    /**
+     * Upload file API endpoint without record ID + Tích hợp nhận diện Face++ (Rút gọn LOG)
+     */
+    public function sendFileWithoutId(Request $request, Response $response, array $args)
     {
         $moduleName = $args['module'] ?? null;
-        
-        // Validate input - only module name is required
         if (empty($moduleName)) {
+            $GLOBALS['log']->error("Face++ LỖI: Thiếu tham số bắt buộc 'module'");
             return $this->errorResponse($response, 'Missing required parameter: module', 400);
         }
         
-        // Get uploaded files from the request
         $uploadedFiles = $request->getUploadedFiles();
-        
-        // Check if file was uploaded
         if (!isset($uploadedFiles['file'])) {
+            $GLOBALS['log']->error("Face++ LỖI: Request gửi lên không chứa biến file nhị phân.");
             return $this->errorResponse($response, 'No file uploaded', 400);
         }
         
         $file = $uploadedFiles['file'];
-        
-        // Check for upload errors
-        if ($file->getError() !== UPLOAD_ERR_OK) {
-            return $this->errorResponse($response, 'File upload failed with error code: ' . $file->getError(), 400);
+        if ($file->getSize() === 0 || $file->getError() !== UPLOAD_ERR_OK) {
+            $GLOBALS['log']->error("Face++ LỖI: File rỗng hoặc quá trình upload file tạm bị lỗi. Mã: " . $file->getError());
+            return $this->errorResponse($response, 'File upload failed or empty data.', 400);
         }
-        
-        // Get file information
-        $originalFilename = $file->getClientFilename();
-        $mimeType = $file->getClientMediaType();
-        $extension = pathinfo($originalFilename, PATHINFO_EXTENSION);
-        
-        // Define the upload directory
-        $uploadDir = realpath(dirname(__FILE__) . '/../../../../../../upload/');
-        
-        if (!is_dir($uploadDir) || !is_writable($uploadDir)) {
-            return $this->errorResponse($response, 'Upload directory is not writable', 500);
-        }
-        
-        // Generate unique filename without record ID
-        $targetFilename = $this->generateUniqueFilename($moduleName, $originalFilename, $extension);
-        
-        // Full path to save the file
-        $targetPath = $uploadDir . '/' . $targetFilename;
-        
+
+        $tempFilePath = $file->getStream()->getMetadata('uri');
+        $baseUrl = $this->getBaseUrl();
+        $uploadDir = '/var/www/html/demo/nhansu/upload';
+
+        $isMatch = false;
+        $dbAvatarName = "";
+        $finalAvatarPath = "";
+        $finalTempFilePath = "";
+        $avatarPath = "";
+
         try {
-            // Move the uploaded file to the target location
-            $file->moveTo($targetPath);
-            
-            // Generate URLs
-            $baseUrl = $this->getBaseUrl();
-            $fileUrl = rtrim($baseUrl, '/') . '/upload/' . $targetFilename;
-            $previewUrl = $baseUrl . "/custom/public/file_preview.php?id={$targetFilename}&type={$moduleName}&preview=true";
-            $downloadUrl = $baseUrl . "/custom/public/file_preview.php?id={$targetFilename}&type={$moduleName}&preview=false";
-            
-            // Return success response
+            if ($moduleName === 'sgt_attendance') {
+                $queryParams = $request->getQueryParams();
+                $parsedBody = $request->getParsedBody(); 
+                $empNo = $queryParams['emp_no'] ?? $parsedBody['emp_no'] ?? $_GET['emp_no'] ?? null;
+
+                if (empty($empNo)) {
+                    $GLOBALS['log']->error("Face++ LỖI: Thiếu tham số 'emp_no'.");
+                    return $this->errorResponse($response, "Missing required parameter: emp_no", 400);
+                }
+
+                global $db;
+                $safeEmpNo = $db->quote($empNo); 
+                
+                $sql = "SELECT emp.id, cstm.profile_image_c 
+                        FROM sgt_employees emp
+                        LEFT JOIN sgt_employees_cstm cstm ON emp.id = cstm.id_c
+                        WHERE emp.ma_nv = '{$safeEmpNo}' AND emp.deleted = 0";
+                        
+                $resultDb = $db->query($sql, true);
+                $row = $db->fetchByAssoc($resultDb);
+                
+                $dbAvatarName = $row['profile_image_c'] ?? "";
+                $empId = $row['id'] ?? "";
+
+                if (empty($dbAvatarName) && empty($empId)) {
+                    $GLOBALS['log']->error("Face++ LỖI: Không tìm thấy nhân viên khớp với mã: {$empNo}");
+                    return $this->errorResponse($response, "Nhân viên chưa có cấu hình ảnh chân dung gốc!", 400);
+                }
+
+                $suiteCrmFileName = $empId . '_profile_image_c';
+                $avatarPath = $uploadDir . '/' . $suiteCrmFileName;
+
+                if (!file_exists($avatarPath)) {
+                    $avatarPath = $uploadDir . '/' . $dbAvatarName;
+                }
+
+                if (!file_exists($avatarPath)) {
+                    $GLOBALS['log']->error("Face++ LỖI: File ảnh gốc không tồn tại vật lý trên server.");
+                    return $this->errorResponse($response, "Không tìm thấy file ảnh gốc trên máy chủ.", 400);
+                }
+
+                $compressedAvatarPath = $uploadDir . '/temp_comp_av_' . $empNo . '.jpg';
+                $compressedCapturePath = $uploadDir . '/temp_comp_cap_' . $empNo . '.jpg';
+
+                $finalAvatarPath = $this->compressImageIfNeeded($avatarPath, $compressedAvatarPath);
+                $finalTempFilePath = $this->compressImageIfNeeded($tempFilePath, $compressedCapturePath);
+
+                // Gửi dữ liệu sang Face++
+                $apiKey = '-NZ0_FfvEI-CVOcmKqyriqFKneoDxU9J';
+                $apiSecret = 'oLm--eChg6r5dMv07it67djEEgr0zweV';
+                $faceppUrl = 'https://api-us.faceplusplus.com/facepp/v3/compare';
+
+                $postData = [
+                    'api_key'      => $apiKey,
+                    'api_secret'   => $apiSecret,
+                    'image_file1'  => new \CURLFile($finalAvatarPath, 'image/jpeg', 'avatar.jpg'),
+                    'image_file2'  => new \CURLFile($finalTempFilePath, 'image/jpeg', 'captured.jpg')
+                ];
+
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, $faceppUrl);
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+                
+                $curlResponse = curl_exec($ch);
+                $curlError = curl_error($ch);
+                curl_close($ch);
+
+                if ($curlError) {
+                    $GLOBALS['log']->fatal("Face++ API LỖI KẾT NỐI: CURL thất bại. Lỗi: {$curlError}");
+                    return $this->errorResponse($response, 'Lỗi kết nối máy chủ AI: ' . $curlError, 500);
+                }
+
+                $aiResult = json_decode($curlResponse, true);
+                if (!isset($aiResult['confidence'])) {
+                    $errorMsg = $aiResult['error_message'] ?? 'Không nhận diện được khuôn mặt.';
+                    $GLOBALS['log']->error("Face++ API LỖI NHẬN DIỆN: {$errorMsg}");
+                    return $this->errorResponse($response, 'Lỗi nhận diện: ' . $errorMsg, 400);
+                }
+
+                $confidence = $aiResult['confidence'];
+                
+                if ($confidence >= 75.0) {
+                    $isMatch = true;
+                } else {
+                    $GLOBALS['log']->warn("Face++ KẾT QUẢ: Xác thực thất bại cho nhân viên {$empNo} (Độ khớp: {$confidence}%)");
+                    return $this->errorResponse($response, "Xác thực khuôn mặt thất bại! Độ khớp chân dung chỉ đạt {$confidence}%.", 400);
+                }
+            }
+
+            $suiteCrmPhysicalName = (!empty($empId)) ? $empId . '_profile_image_c' : $dbAvatarName;
+            $physicalFileNameToRender = file_exists($uploadDir . '/' . $suiteCrmPhysicalName) ? $suiteCrmPhysicalName : $dbAvatarName;
+
+            $fileUrl     = rtrim($baseUrl, '/') . '/upload/' . $physicalFileNameToRender;
+            $previewUrl  = $baseUrl . "/custom/public/file_preview.php?id={$physicalFileNameToRender}&type={$moduleName}&preview=true";
+            $downloadUrl = $baseUrl . "/custom/public/file_preview.php?id={$physicalFileNameToRender}&type={$moduleName}&preview=false";
+
             $result = [
-                'success' => true,
-                'message' => 'File uploaded successfully',
-                'filename' => $targetFilename,
-                'original_filename' => $originalFilename,
-                'mime_type' => $mimeType,
-                'file_url' => $fileUrl,
-                'preview_url' => $previewUrl,
-                'download_url' => $downloadUrl,
-                'file_size' => filesize($targetPath)
+                'success'           => true,
+                'is_match'          => $isMatch,
+                'profile_image_c'   => $dbAvatarName, 
+                'preview_url'       => $previewUrl,
+                'file_url'          => $fileUrl,
+                'download_url'      => $downloadUrl,
+                'message'           => 'Xác thực sinh trắc học thành công. Hợp lệ để điểm danh.'
             ];
             
             $response->getBody()->write(json_encode($result));
             return $response->withHeader('Content-Type', 'application/json');
+
         } catch (\Exception $e) {
-            return $this->errorResponse($response, 'Failed to save uploaded file: ' . $e->getMessage(), 500);
+            $GLOBALS['log']->fatal("Face++ EXCEPTION CAUGHT: " . $e->getMessage());
+            return $this->errorResponse($response, 'Failed to process face verification: ' . $e->getMessage(), 500);
+        } finally {
+            // Dọn dẹp file nén tạm bợ để tránh tràn dung lượng ổ đĩa
+            if (!empty($finalAvatarPath) && $finalAvatarPath !== $avatarPath && file_exists($finalAvatarPath)) {
+                @unlink($finalAvatarPath);
+            }
+            if (!empty($finalTempFilePath) && $finalTempFilePath !== $tempFilePath && file_exists($finalTempFilePath)) {
+                @unlink($finalTempFilePath);
+            }
         }
     }
     
-    /**
-     * Generate a unique filename based on module and timestamp
-     * 
-     * @param string $moduleName
-     * @param string $originalFilename
-     * @param string $extension
-     * @return string
-     */
     private function generateUniqueFilename($moduleName, $originalFilename, $extension)
     {
-        // Generate UUID v4
         $uuid = sprintf(
             '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
             mt_rand(0, 0xffff), mt_rand(0, 0xffff),
@@ -532,65 +470,43 @@ class FileController
             mt_rand(0, 0x3fff) | 0x8000,
             mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
         );
-        
-        // Generate timestamp
         $timestamp = date('dmYHis');
-        
-        // Build filename based on module type
-        if ($moduleName === 'AOS_Products') {
-            // For AOS_Products: ddmmyyyyhhmmss_{uuid}.{extension}
-            $targetFilename = $timestamp . '_' . $uuid;
-            if ($extension) {
-                $targetFilename .= '.' . $extension;
-            }
-        } else {
-            // For all other modules: {timestamp}_{uuid}.{extension}
-            $targetFilename = $timestamp . '_' . $uuid;
-            if ($extension) {
-                $targetFilename .= '.' . $extension;
-            }
+        $targetFilename = $timestamp . '_' . $uuid;
+        if ($extension) {
+            $targetFilename .= '.' . $extension;
         }
-        
         return $targetFilename;
     }
     
-    /**
-     * Update file information in the database
-     * 
-     * @param string $moduleName
-     * @param string $id
-     * @param string $filename
-     * @param string $mimeType
-     */
     private function updateFileInfoInDb($moduleName, $id, $filename, $mimeType)
     {
         global $beanList;
-        
-        // Check if module exists in bean list
         if (!isset($beanList[$moduleName])) {
             return;
         }
-        
         $beanClass = $beanList[$moduleName];
-        
-        // Load the bean for this record
         $bean = new $beanClass();
         if ($bean->retrieve($id)) {
-            // Update file-related fields if they exist in this bean
             if (property_exists($bean, 'filename')) {
                 $bean->filename = $filename;
             }
-            
             if (property_exists($bean, 'file_mime_type')) {
                 $bean->file_mime_type = $mimeType;
             }
-            
             if (property_exists($bean, 'file_ext')) {
                 $bean->file_ext = pathinfo($filename, PATHINFO_EXTENSION);
             }
-            
-            // Save the bean
             $bean->save();
         }
+    }
+
+    private function errorResponse(Response $response, $message, $statusCode = 400)
+    {
+        $result = [
+            'success' => false,
+            'message' => $message,
+        ];
+        $response->getBody()->write(json_encode($result));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus($statusCode);
     }
 }
